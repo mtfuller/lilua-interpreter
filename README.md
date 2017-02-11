@@ -17,7 +17,8 @@ A = 5
 
 -- Incorrect Identifiers...
 ab = 2
-count = 8```
+count = 8
+```
 
 #### Only One Supported Data Type: Integer
 ```Lua
@@ -29,7 +30,8 @@ c = 2
 -- Unsupported...
 a = 5.6
 b = false
-c = "hello"```
+c = "hello"
+```
 
 #### Reverse Polish Notation for Arithmetic/Boolean Operations
 ```Lua
@@ -41,14 +43,16 @@ z = - + - * 2 a / 30 c b 17
 -- Incorrect notation...
 x = a / c * b
 z = 2 * a - 30 / c + b - 17
-c > 0```
+c > 0
+```
 
 ## LiLua Compiler
 Blah blah blah...
 
 ```
 your-directory
-|-- my-program.lua```
+|-- my-program.lua
+```
 
 ```shell
 liluac -c "<PATH>/your-directory/my-program.lua"
@@ -57,7 +61,8 @@ liluac -c "<PATH>/your-directory/my-program.lua"
 ```
 your-directory
 |-- my-program.lil
-|-- my-program.lua```
+|-- my-program.lua
+```
 
 ## LiLua Interpreter
 Blah blah blah...
@@ -65,7 +70,8 @@ Blah blah blah...
 ```
 your-directory
 |-- my-program.lil
-|-- my-program.lua```
+|-- my-program.lua
+```
 
 ```shell
 java -jar lilua.jar "<PATH>/your-directory/my-program.lil"

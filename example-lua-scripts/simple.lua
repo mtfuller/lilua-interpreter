@@ -1,8 +1,10 @@
 function f()
   a = 7
-  print(A)
+  print(a)
   b = 8
-  print(B)
-  c = A * B
-  print(C)
+  print(b)
+  c = a * b
+  print(c)
 end
+
+f()

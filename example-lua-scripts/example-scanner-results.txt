@@ -1,0 +1,33 @@
+File: simple.lua
+Results:
+  <keyword>         function
+  <id>              f
+  <left_paren>      (
+  <right_paren>     )
+  <id>              a
+  <assignment_op>   =
+  <digit_literal>   7
+  <keyword>         print
+  <left_paren>      (
+  <id>              a
+  <right_paren>     )
+  <id>              b
+  <assignment_op>   =
+  <digit_literal>   8
+  <keyword>         print
+  <left_paren>      (
+  <id>              b
+  <right_paren>     )
+  <id>              c
+  <assignment_op>   =
+  <mul_operator>    *
+  <id>              a
+  <id>              b
+  <keyword>         print
+  <left_paren>      (
+  <id>              c
+  <right_paren>     )
+  <keyword>         end
+  <id>              f
+  <left_paren>      (
+  <right_paren>     )

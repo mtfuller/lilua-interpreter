@@ -6,7 +6,7 @@ Results:
   <right_paren>     )
   <id>              a
   <assignment_op>   =
-  <integer_literal>   7
+  <integer_literal> 7
   <keyword>         print
   <left_paren>      (
   <id>              a

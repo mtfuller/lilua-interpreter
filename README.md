@@ -2,11 +2,9 @@
 A small interpreter written in C/C++ and Java that can translate a minimal version of Lua (called "LiLua" for "Light Lua") into an intermediate form to then be interpreted by an interpretive engine.
 
 ## Overview
-Blah blah blah...
-
+This README file gives a rough overview of the LiLua interpreter. A brief description of LiLua is discussed in the next section. An quick example of the usage of the LiLua compiler and interpreter is presented in later sections. Repository can be found at the [GitHub Repo](https://github.com/mtfuller/lilua-interpreter).
 ## What is LiLua?
 LiLua, or "Light Lua," is a small subset of the Lua programming language. Here are the major differences:
-
 #### Single-character, Non-case-sensitive Identifiers
 ```Lua
 -- This statement...
@@ -33,8 +31,28 @@ b = false
 c = "hello"
 ```
 
+#### All Executable Code is Placed within a Function Declaration
+```Lua
+-- Correct...
+function f()
+    a = 2
+    b = 3
+    c = a + b
+    print(c)
+end
+
+-- Incorrect...
+a = 5
+b = 2 * a
+function f()
+    c = 7
+    print(c)
+end
+print(b)
+```
+
 ## LiLua Compiler
-Blah blah blah...
+The LiLua compiler is a small application written in C/C++ that takes in a Lua file, and produces an intermediate form. The intermediate form is then translated into a type of "byte code", which is then placed into a .lil file.
 
 ```
 your-directory
@@ -52,7 +70,7 @@ your-directory
 ```
 
 ## LiLua Interpreter
-Blah blah blah...
+The LiLua Interpreter takes in a .lil file, and then the interpreter reads the input from the file and performs corresponding actions.
 
 ```
 your-directory

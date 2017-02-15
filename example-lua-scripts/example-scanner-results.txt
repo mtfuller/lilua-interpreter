@@ -1,33 +1,30 @@
 File: simple.lua
 Results:
-  <keyword>         function
+  <Unknown>         function
   <id>              f
-  <left_paren>      (
-  <right_paren>     )
+  <Unknown>         (
+  <Unknown>         )
   <id>              a
   <assignment_op>   =
   <integer_literal> 7
-  <keyword>         print
-  <left_paren>      (
+  <Unknown>         print
+  <Unknown>         (
   <id>              a
-  <right_paren>     )
+  <Unknown>         )
   <id>              b
   <assignment_op>   =
   <digit_literal>   8
-  <keyword>         print
-  <left_paren>      (
+  <Unknown>         print
+  <Unknown>         (
   <id>              b
-  <right_paren>     )
+  <Unknown>         )
   <id>              c
   <assignment_op>   =
   <mul_operator>    *
   <id>              a
   <id>              b
-  <keyword>         print
-  <left_paren>      (
+  <Unknown>         print
+  <Unknown>         (
   <id>              c
-  <right_paren>     )
-  <keyword>         end
-  <id>              f
-  <left_paren>      (
-  <right_paren>     )
+  <Unknown>         )
+  <Unknown>         end

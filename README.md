@@ -33,19 +33,6 @@ b = false
 c = "hello"
 ```
 
-#### Reverse Polish Notation for Arithmetic/Boolean Operations
-```Lua
--- Correct notation...
-x = * / a c b
-z = - + - * 2 a / 30 c b 17
-> c 0
-
--- Incorrect notation...
-x = a / c * b
-z = 2 * a - 30 / c + b - 17
-c > 0
-```
-
 ## LiLua Compiler
 Blah blah blah...
 

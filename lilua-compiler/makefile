@@ -1,20 +1,20 @@
 # ------------------------------------------------------------------------------
 # Makefile
 # ------------------------------------------------------------------------------
-CC 								= g++
-CFLAGS 						= -g -Wall
-INC_SCANNER				= -Isrc/Scanner
+CC = g++
+CFLAGS = -g -Wall
+INC_SCANNER = -Isrc/Scanner
 
-SOURCE_DIR 				= src
-SOURCE_BUILD_DIR	= build/src
-SCANNER_CPP				= $(SOURCE_DIR)/Scanner/Scanner.cpp
+SOURCE_DIR = src
+SOURCE_BUILD_DIR = build/src
+SCANNER_CPP = $(SOURCE_DIR)/Scanner/Scanner.cpp
 
-TEST_DIR 					= test
-TEST_SCANNER			= $(TEST_DIR)/scanner_test.cpp
-TEST_BUILD_DIR		= build/test
+TEST_DIR = test
+TEST_SCANNER = $(TEST_DIR)/scanner_test.cpp
+TEST_BUILD_DIR = build/test
 
-TEST							= scanner_test
-TEST_EXES					= $(patsubst %,$(TEST_BUILD_DIR)/%.exe,$(TEST))
+TEST = scanner_test
+TEST_EXES = $(patsubst %,$(TEST_BUILD_DIR)/%.exe,$(TEST))
 # ------------------------------------------------------------------------------
 
 all:

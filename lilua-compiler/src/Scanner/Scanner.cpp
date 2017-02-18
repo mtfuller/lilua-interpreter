@@ -6,6 +6,7 @@
 // Description:
 //
 // =============================================================================
+#include <iostream>
 #include "Scanner.h"
 #include "lilua_symbol.h"
 
@@ -17,7 +18,15 @@ namespace lilua_interpreter_project {
   }
 
   LEXEME Scanner::lex() {
+    sourceFile.open("res/simple.lua");
+    char c;
+    while (sourceFile.get(c))
+        std::cout << c << std::endl;
     LEXEME test = {UNKNOWN_TOKEN, "TEST"};
     return test;
+  }
+
+  char Scanner::getChar() {
+      return
   }
 };

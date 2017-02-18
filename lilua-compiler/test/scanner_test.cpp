@@ -14,11 +14,14 @@
 using namespace lilua_interpreter_project;
 
 int main() {
-  std::ifstream inputFile;
-  Scanner myScanner(inputFile);
-  LEXEME test = myScanner.lex();
-  std::cout << "LEXEME:" << std::endl;
-  std::cout << "TOKEN CODE:\t" << test.token << '\n';
-  std::cout << "CHARACTERS:\t" << test.lex << '\n';
+  char simple[] = "build/test/res/simple.lua";
+  Scanner myScanner(simple);
+  LEXEME test;
+  do {
+    test = myScanner.lex();
+    std::cout << "LEXEME:" << std::endl;
+    std::cout << "TOKEN CODE:\t" << test.token << '\n';
+    std::cout << "CHARACTERS:\t" << test.lex << '\n';
+  } while (test.token != -1);
   return 0;
 }

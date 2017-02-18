@@ -15,11 +15,11 @@
 #define LEXEME_BUFFER_SIZE  100
 
 namespace lilua_interpreter_project {
-  typedef unsigned int token_type;
+  typedef int token_type;
 
   struct LEXEME {
     token_type token;
-    const char *lex;
+    char lex;
   };
 
   struct KEYWORD {
@@ -32,7 +32,8 @@ namespace lilua_interpreter_project {
     // =========================================================================
     // Constructors
     // =========================================================================
-    Scanner (std::ifstream& file);
+    Scanner (char *fileStr);
+    ~Scanner ();
     // =========================================================================
     // Public Member Functions
     // =========================================================================

@@ -11,22 +11,33 @@
 #include "lilua_symbol.h"
 
 namespace lilua_interpreter_project {
-  Scanner::Scanner(std::ifstream& file) {
-    sourceFile = &file;
+  Scanner::Scanner(char *file) {
+    sourceFile = new std::ifstream(file);
+    if (sourceFile->fail()) {
+      std::cout << "Failed to open file..." << '\n';
+      sourceFile->clear();
+    }
     err_flag = false;
     current_token = UNKNOWN_TOKEN;
   }
 
+  Scanner::~Scanner() {
+    delete sourceFile;
+  }
+
   LEXEME Scanner::lex() {
-    sourceFile.open("res/simple.lua");
     char c;
-    while (sourceFile.get(c))
-        std::cout << c << std::endl;
-    LEXEME test = {UNKNOWN_TOKEN, "TEST"};
+    if (!sourceFile->get(c)) {
+      sourceFile->close();
+      LEXEME test = {EOF_TOKEN, c};
+      return test;
+    }
+    LEXEME test = {UNKNOWN_TOKEN, c};
     return test;
   }
 
   char Scanner::getChar() {
-      return
+    char b = 'b';
+    return b;
   }
 };

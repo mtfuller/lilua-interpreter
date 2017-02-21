@@ -13,19 +13,23 @@
 #include "lilua_symbol.h"   // Symbol definitions
 
 #define LEXEME_BUFFER_SIZE  100
+#define KEYWORD_SIZE        10
 
 namespace lilua_interpreter_project {
   typedef int token_type;
 
   struct LEXEME {
     token_type token;
-    char lex;
+    const char* lex;
   };
 
   struct KEYWORD {
+    const char* name;
     token_type type;
-    const char *name;
   };
+
+  bool isWhitespace(char c);
+  token_type keyword_bin_search(const char* key);
 
   class Scanner {
   public:
@@ -39,11 +43,11 @@ namespace lilua_interpreter_project {
     // =========================================================================
     LEXEME lex();
   private:
-    static KEYWORD keywordTable[];
     // =========================================================================
     // Private Member Functions
     // =========================================================================
     char getChar();
+    char peekChar();
     // =========================================================================
     // Constant Member Functions
     // =========================================================================
@@ -52,7 +56,7 @@ namespace lilua_interpreter_project {
     // Private Data Members
     // =========================================================================
     std::ifstream* sourceFile;
-    bool err_flag;
+    bool err_flag, eof_flag;
     token_type current_token;
     char current_lexeme[LEXEME_BUFFER_SIZE];
   };

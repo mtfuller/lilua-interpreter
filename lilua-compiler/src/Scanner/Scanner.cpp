@@ -69,7 +69,11 @@ namespace lilua_interpreter_project {
         } else if (std::isdigit(c)) {
             current_token = LITERAL_INTEGER;
         } else if (c == '=') {
-            current_token = ASSIGNMENT_OPERATOR;
+            if (current_token == UNKNOWN_TOKEN) {
+                current_token = ASSIGNMENT_OPERATOR;
+            } else if (current_token == ASSIGNMENT_OPERATOR) {
+                current_token = EQ_OPERATOR;
+            }
         } else if (c == '<') {
             current_token = LT_OPERATOR;
         } else if (c == '>') {

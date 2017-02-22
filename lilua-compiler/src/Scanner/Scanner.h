@@ -36,7 +36,7 @@ namespace lilua_interpreter_project {
     // =========================================================================
     // Constructors
     // =========================================================================
-    Scanner (char *fileStr);
+    Scanner (const char *fileStr);
     ~Scanner ();
     // =========================================================================
     // Public Member Functions

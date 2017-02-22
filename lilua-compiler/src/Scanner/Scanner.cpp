@@ -27,7 +27,7 @@ namespace lilua_interpreter_project {
         {"while",WHILE_KEYWORD}
     };
 
-  Scanner::Scanner(char *file) {
+  Scanner::Scanner(const char *file) {
     sourceFile = new std::ifstream(file);
     if (sourceFile->fail()) {
       std::cout << "Failed to open file..." << '\n';

@@ -1,10 +1,12 @@
 // =============================================================================
 // Author(s): Thomas Fuller
+// Course:    CS 4308 (01)
+// Instr:     Dr. Garrido
 // Project:   Module 3 - 1st Deliverable
 // File:      lilua_symbol.h
 // =============================================================================
 // Description:
-//
+// Token code definitions for each token
 // =============================================================================
 
 // TOKEN DEFINITIONS:
@@ -24,9 +26,7 @@
 #define MULT_OPERATOR           12
 #define DIV_OPERATOR            13
 
-
-// KEYWORDS
-// Needed keywords: do,else,end,function,if,null,print,repeat,then,until,while
+// KEYWORD DEFINITIONS
 #define NULL_KEYWORD            14
 #define DO_KEYWORD              15
 #define ELSE_KEYWORD            16

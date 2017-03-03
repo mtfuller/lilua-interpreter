@@ -1,3 +1,4 @@
+
 File: simple.lua
 Results:
   <keyword>         function

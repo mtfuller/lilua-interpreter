@@ -1,0 +1,33 @@
+==========================================
+| TOKEN CODE           | LEXEME          |
+==========================================
+| FUNCTION_KEYWORD     | function        |
+| ID                   | f               |
+| UNKNOWN_TOKEN        | (               |
+| UNKNOWN_TOKEN        | )               |
+| ID                   | a               |
+| ASSIGNMENT_OPERATOR  | =               |
+| LITERAL_INTEGER      | 7               |
+| PRINT_KEYWORD        | print           |
+| UNKNOWN_TOKEN        | (               |
+| ID                   | a               |
+| UNKNOWN_TOKEN        | )               |
+| ID                   | b               |
+| ASSIGNMENT_OPERATOR  | =               |
+| LITERAL_INTEGER      | 8               |
+| PRINT_KEYWORD        | print           |
+| UNKNOWN_TOKEN        | (               |
+| ID                   | b               |
+| UNKNOWN_TOKEN        | )               |
+| ID                   | c               |
+| ASSIGNMENT_OPERATOR  | =               |
+| ID                   | a               |
+| MULT_OPERATOR        | *               |
+| ID                   | b               |
+| PRINT_KEYWORD        | print           |
+| UNKNOWN_TOKEN        | (               |
+| ID                   | c               |
+| UNKNOWN_TOKEN        | )               |
+| END_KEYWORD          | end             |
+| EOF                  |                 |
+==========================================

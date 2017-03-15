@@ -17,24 +17,28 @@
 using namespace lilua_interpreter_project;
 
 const std::string token_arr[] = {
-    "EOF","UNKNOWN_TOKEN","ID","LITERAL_INTEGER","ASSIGNMENT_OPERATOR",
-    "LE_OPERATOR","LT_OPERATOR","GE_OPERATOR","GT_OPERATOR","EQ_OPERATOR",
-    "NE_OPERATOR","ADD_OPERATOR","SUB_OPERATOR","MULT_OPERATOR","DIV_OPERATOR",
-    "NULL_KEYWORD","DO_KEYWORD","ELSE_KEYWORD","END_KEYWORD","FUNCTION_KEYWORD",
-    "IF_KEYWORD","PRINT_KEYWORD","REPEAT_KEYWORD","THEN_KEYWORD",
-    "UNTIL_KEYWORD","WHILE_KEYWORD"
+  "EOF","UNKNOWN_TOKEN","LEFT_PAREN_TOKEN","RIGHT_PAREN_TOKEN","ID",
+  "LITERAL_INTEGER","ASSIGNMENT_OPERATOR","LE_OPERATOR","LT_OPERATOR",
+  "GE_OPERATOR","GT_OPERATOR","EQ_OPERATOR","NE_OPERATOR","ADD_OPERATOR",
+  "SUB_OPERATOR","MULT_OPERATOR","DIV_OPERATOR","NULL_KEYWORD","DO_KEYWORD",
+  "ELSE_KEYWORD","END_KEYWORD","FUNCTION_KEYWORD","IF_KEYWORD","PRINT_KEYWORD",
+  "REPEAT_KEYWORD","THEN_KEYWORD","UNTIL_KEYWORD","WHILE_KEYWORD"
 };
+
+int get_token_index(token_type token_code) {
+  return token_code + 1;
+}
 
 bool lexeme_comp(LEXEME actual, LEXEME expected) {
     if (actual.token == expected.token) {
         char substring[11];
         memcpy(substring, actual.lex, 10);
-        printf("| %-20s | %-15s |\n", token_arr[actual.token+1].c_str(), substring);
+        printf("| %-20s | %-15s |\n", token_arr[get_token_index(actual.token)].c_str(), substring);
         return true;
     } else {
         std::cout << "Failed.\n\tAfter calling the scanner, the incorrect " <<
-        "token was returned.\n\tThe expected token was: "<< token_arr[expected.token+1] <<
-        ".\n\t" << "The actual token was: " << token_arr[actual.token+1] << ".\n";
+        "token was returned.\n\tThe expected token was: "<< token_arr[get_token_index(expected.token)] <<
+        ".\n\t" << "The actual token was: " << token_arr[get_token_index(actual.token)] << ".\n";
         return false;
     }
 }
@@ -49,7 +53,7 @@ bool keyword_test(const char* key, int expected) {
         std::cout << "failed. Keyword does not exist." << '\n';
         return false;
     } else {
-        std::cout << "failed. It returned: " << token_arr[val+1] << '\n';
+        std::cout << "failed. It returned: " << token_arr[get_token_index(val)] << '\n';
         return false;
     }
 }
@@ -85,31 +89,31 @@ bool test1() {
     const LEXEME ans1[] = {
         {FUNCTION_KEYWORD,"function"},
         {ID,"f"},
-        {UNKNOWN_TOKEN,"("},
-        {UNKNOWN_TOKEN,")"},
+        {LEFT_PAREN_TOKEN,"("},
+        {RIGHT_PAREN_TOKEN,")"},
         {ID,"a"},
         {ASSIGNMENT_OPERATOR,"="},
         {LITERAL_INTEGER,"7"},
         {PRINT_KEYWORD,"print"},
-        {UNKNOWN_TOKEN,"("},
+        {LEFT_PAREN_TOKEN,"("},
         {ID,"a"},
-        {UNKNOWN_TOKEN,")"},
+        {RIGHT_PAREN_TOKEN,")"},
         {ID,"b"},
         {ASSIGNMENT_OPERATOR,"="},
         {LITERAL_INTEGER,"8"},
         {PRINT_KEYWORD,"print"},
-        {UNKNOWN_TOKEN,"("},
+        {LEFT_PAREN_TOKEN,"("},
         {ID,"b"},
-        {UNKNOWN_TOKEN,")"},
+        {RIGHT_PAREN_TOKEN,")"},
         {ID,"c"},
         {ASSIGNMENT_OPERATOR,"="},
         {ID,"a"},
         {MULT_OPERATOR,"*"},
         {ID,"b"},
         {PRINT_KEYWORD,"print"},
-        {UNKNOWN_TOKEN,"("},
+        {LEFT_PAREN_TOKEN,"("},
         {ID,"c"},
-        {UNKNOWN_TOKEN,")"},
+        {RIGHT_PAREN_TOKEN,")"},
         {END_KEYWORD,"end"},
         {EOF_TOKEN,""}
     };
@@ -125,8 +129,8 @@ bool test2() {
     const LEXEME ans2[] = {
         {FUNCTION_KEYWORD,"function"},
         {ID,"f"},
-        {UNKNOWN_TOKEN,"("},
-        {UNKNOWN_TOKEN,")"},
+        {LEFT_PAREN_TOKEN,"("},
+        {RIGHT_PAREN_TOKEN,")"},
         {ID,"n"},
         {ASSIGNMENT_OPERATOR,"="},
         {LITERAL_INTEGER,"8"},
@@ -142,9 +146,9 @@ bool test2() {
         {ASSIGNMENT_OPERATOR,"="},
         {LITERAL_INTEGER,"1"},
         {PRINT_KEYWORD,"print"},
-        {UNKNOWN_TOKEN,"("},
+        {LEFT_PAREN_TOKEN,"("},
         {ID,"a"},
-        {UNKNOWN_TOKEN,")"},
+        {RIGHT_PAREN_TOKEN,")"},
         {IF_KEYWORD,"if"},
         {ID,"n"},
         {EQ_OPERATOR,"=="},
@@ -157,9 +161,9 @@ bool test2() {
         {LITERAL_INTEGER,"1"},
         {ELSE_KEYWORD,"else"},
         {PRINT_KEYWORD,"print"},
-        {UNKNOWN_TOKEN,"("},
+        {LEFT_PAREN_TOKEN,"("},
         {ID,"b"},
-        {UNKNOWN_TOKEN,")"},
+        {RIGHT_PAREN_TOKEN,")"},
         {IF_KEYWORD,"if"},
         {ID,"n"},
         {EQ_OPERATOR,"=="},
@@ -196,9 +200,9 @@ bool test2() {
         {ASSIGNMENT_OPERATOR,"="},
         {ID,"c"},
         {PRINT_KEYWORD,"print"},
-        {UNKNOWN_TOKEN,"("},
+        {LEFT_PAREN_TOKEN,"("},
         {ID,"c"},
-        {UNKNOWN_TOKEN,")"},
+        {RIGHT_PAREN_TOKEN,")"},
         {ID,"n"},
         {ASSIGNMENT_OPERATOR,"="},
         {ID,"n"},
@@ -209,9 +213,9 @@ bool test2() {
         {END_KEYWORD,"end"},
         {ELSE_KEYWORD,"else"},
         {PRINT_KEYWORD,"print"},
-        {UNKNOWN_TOKEN,"("},
+        {LEFT_PAREN_TOKEN,"("},
         {LITERAL_INTEGER,"0"},
-        {UNKNOWN_TOKEN,")"},
+        {RIGHT_PAREN_TOKEN,")"},
         {END_KEYWORD,"end"},
         {END_KEYWORD,"end"},
         {EOF_TOKEN,"\0"}
@@ -229,31 +233,31 @@ bool test3() {
     const LEXEME ans3[] = {
         {FUNCTION_KEYWORD,"function"},
         {ID,"f"},
-        {UNKNOWN_TOKEN,"("},
-        {UNKNOWN_TOKEN,")"},
+        {LEFT_PAREN_TOKEN,"("},
+        {RIGHT_PAREN_TOKEN,")"},
         {ID,"a"},
         {ASSIGNMENT_OPERATOR,"="},
         {LITERAL_INTEGER,"7"},
         {PRINT_KEYWORD,"print"},
-        {UNKNOWN_TOKEN,"("},
+        {LEFT_PAREN_TOKEN,"("},
         {ID,"a"},
-        {UNKNOWN_TOKEN,")"},
+        {RIGHT_PAREN_TOKEN,")"},
         {ID,"b"},
         {ASSIGNMENT_OPERATOR,"="},
         {LITERAL_INTEGER,"8"},
         {PRINT_KEYWORD,"print"},
-        {UNKNOWN_TOKEN,"("},
+        {LEFT_PAREN_TOKEN,"("},
         {ID,"b"},
-        {UNKNOWN_TOKEN,")"},
+        {RIGHT_PAREN_TOKEN,")"},
         {ID,"c"},
         {ASSIGNMENT_OPERATOR,"="},
         {ID,"a"},
         {MULT_OPERATOR,"*"},
         {ID,"b"},
         {PRINT_KEYWORD,"print"},
-        {UNKNOWN_TOKEN,"("},
+        {LEFT_PAREN_TOKEN,"("},
         {ID,"c"},
-        {UNKNOWN_TOKEN,")"},
+        {RIGHT_PAREN_TOKEN,")"},
         {ID,"d"},
         {ASSIGNMENT_OPERATOR,"="},
         {ID,"a"},
@@ -275,14 +279,14 @@ bool test3() {
         {LITERAL_INTEGER,"1"},
         {THEN_KEYWORD,"then"},
         {PRINT_KEYWORD,"print"},
-        {UNKNOWN_TOKEN,"("},
+        {LEFT_PAREN_TOKEN,"("},
         {ID,"d"},
-        {UNKNOWN_TOKEN,")"},
+        {RIGHT_PAREN_TOKEN,")"},
         {ELSE_KEYWORD,"else"},
         {PRINT_KEYWORD,"print"},
-        {UNKNOWN_TOKEN,"("},
+        {LEFT_PAREN_TOKEN,"("},
         {LITERAL_INTEGER,"2"},
-        {UNKNOWN_TOKEN,")"},
+        {RIGHT_PAREN_TOKEN,")"},
         {END_KEYWORD,"end"},
         {IF_KEYWORD,"if"},
         {ID,"f"},
@@ -290,14 +294,14 @@ bool test3() {
         {LITERAL_INTEGER,"0"},
         {THEN_KEYWORD,"then"},
         {PRINT_KEYWORD,"print"},
-        {UNKNOWN_TOKEN,"("},
+        {LEFT_PAREN_TOKEN,"("},
         {ID,"f"},
-        {UNKNOWN_TOKEN,")"},
+        {RIGHT_PAREN_TOKEN,")"},
         {ELSE_KEYWORD,"else"},
         {PRINT_KEYWORD,"print"},
-        {UNKNOWN_TOKEN,"("},
+        {LEFT_PAREN_TOKEN,"("},
         {LITERAL_INTEGER,"0"},
-        {UNKNOWN_TOKEN,")"},
+        {RIGHT_PAREN_TOKEN,")"},
         {END_KEYWORD,"end"},
         {IF_KEYWORD,"if"},
         {ID,"e"},
@@ -305,14 +309,14 @@ bool test3() {
         {LITERAL_INTEGER,"15"},
         {THEN_KEYWORD,"then"},
         {PRINT_KEYWORD,"print"},
-        {UNKNOWN_TOKEN,"("},
+        {LEFT_PAREN_TOKEN,"("},
         {ID,"e"},
-        {UNKNOWN_TOKEN,")"},
+        {RIGHT_PAREN_TOKEN,")"},
         {ELSE_KEYWORD,"else"},
         {PRINT_KEYWORD,"print"},
-        {UNKNOWN_TOKEN,"("},
+        {LEFT_PAREN_TOKEN,"("},
         {LITERAL_INTEGER,"0"},
-        {UNKNOWN_TOKEN,")"},
+        {RIGHT_PAREN_TOKEN,")"},
         {END_KEYWORD,"end"},
         {END_KEYWORD,"end"},
         {EOF_TOKEN,"\0"}

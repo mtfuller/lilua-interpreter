@@ -49,6 +49,12 @@ namespace lilua_interpreter_project {
   bool isWhitespace(char c);
 
   // ===========================================================================
+  // bool isParen(char c)
+  // Returns true if the given character is a left or right parenthesis.
+  // ===========================================================================
+  bool isParen(char c);
+
+  // ===========================================================================
   // token_type keyword_bin_search(const char* key)
   // Returns the token code of the corresponding string "key". If the key is
   // invalid, it returns -1.
@@ -94,6 +100,13 @@ namespace lilua_interpreter_project {
     // move the file pointer to the next character.
     // =========================================================================
     char peekChar();
+
+    // =========================================================================
+    // char skipWhitespace()
+    // Returns the next non-whitespace character from the input file. If there
+    // are no more characters, -1 is returned.
+    // =========================================================================
+    char skipWhitespace();
 
     // Used for reading the input file
     std::ifstream* sourceFile;

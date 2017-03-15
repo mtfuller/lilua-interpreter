@@ -51,22 +51,19 @@ namespace lilua_interpreter_project {
 
   LEXEME Scanner::lex() {
     char c, n;
-    unsigned int index = 0;
+    int index = 0;
     current_token = UNKNOWN_TOKEN;
 
-    //
+    // Erase the contents of current_lexeme
     memset (current_lexeme,' ',LEXEME_BUFFER_SIZE);
 
     // Keep getting new characters from the file until getChar() will return a
     // non-whitespace character.
-    while (isWhitespace(peekChar())) c = getChar();
+    c = skipWhitespace();
 
     // Keep analyzing characters, one after another, until whitespace or
     // parenthesis are encountered.
-    do {
-      // Get the next character
-      c = getChar();
-
+    while (!isWhitespace(c)) {
       // Check if we have reached the end of file. If we have, close the input
       // file and return a EOF token
       if (eof_flag) {
@@ -78,8 +75,8 @@ namespace lilua_interpreter_project {
       // Conditional structure to test the current character
       if (std::isalpha(c)) {
         if (current_token == ID) {
-          current_token = NULL_KEYWORD;
-        } else if (current_token != NULL_KEYWORD) {
+          current_token = UKNOWN_KEYWORD;
+        } else if (current_token != UKNOWN_KEYWORD) {
           current_token = ID;
         }
       } else if (std::isdigit(c)) {
@@ -106,32 +103,35 @@ namespace lilua_interpreter_project {
         current_token = MULT_OPERATOR;
       } else if (c == '/') {
         current_token = DIV_OPERATOR;
-      } else {
-        current_token = UNKNOWN_TOKEN;
+      } else if (c == '(') {
+        current_token = LEFT_PAREN_TOKEN;
+      } else if (c == ')') {
+        current_token = RIGHT_PAREN_TOKEN;
       }
 
       // Append the current character to the LEXEME's string of characters
       current_lexeme[index++] = c;
 
-      // Check special cases when lexical analysis must stop. If the next
-      // character in the input file is "(", ")", or whitespace, then stop
-      // lexical analysis of the character.
       n = peekChar();
-      if (n == '(' || n == ')' || c == '(' || c == ')' || isWhitespace(n))
-        break;
+      if (isParen(c) || isParen(n) || isWhitespace(n)) break;
 
-      // Loop until current charcter is whitespace
-    } while (!isWhitespace(c));
+      // Get the next character
+      c = getChar();
+    }
+
+
 
     // If the lexical analysis process found a keyword, we need to figure out
     // what keyword it is.
-    if (current_token == NULL_KEYWORD) {
+    if (current_token == UKNOWN_KEYWORD) {
       // Create a temp string of the same size and characters as the current
       // lexeme.
       std::string temp(current_lexeme, index);
 
       // Get the token code of the keyword
       current_token = keyword_bin_search(temp.c_str());
+
+
     }
 
     // Return the LEXEME's token code and character string
@@ -150,8 +150,21 @@ namespace lilua_interpreter_project {
     return c;
   }
 
+  char Scanner::skipWhitespace() {
+    char c;
+    do {
+      c = getChar();
+      if (eof_flag) return -1;
+    } while (isWhitespace(c));
+    return c;
+  }
+
   bool isWhitespace(char c) {
     return std::iscntrl(c) || std::isspace(c);
+  }
+
+  bool isParen(char c) {
+    return c == '(' || c == ')';
   }
 
   token_type keyword_bin_search(const char* key) {

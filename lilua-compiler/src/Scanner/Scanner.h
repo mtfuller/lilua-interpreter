@@ -72,21 +72,27 @@ namespace lilua_interpreter_project {
     // =========================================================================
     // Public Member Functions
     // =========================================================================
+
+    // =========================================================================
+    // LEXEME lex()
+    // Returns a LEXEME (containing both a token and the actual string of chars)
+    // of the next token in the scanner's input file.
+    // =========================================================================
     LEXEME lex();
 
   private:
-    // =======================================================================
+    // =========================================================================
     // char getChar()
     // Returns the next character in the input file. This function also moves
     // the file pointer to the next character.
-    // =======================================================================
+    // =========================================================================
     char getChar();
 
-    // =======================================================================
+    // =========================================================================
     // char peekChar()
     // Returns the next character in the input file. This function does NOT
     // move the file pointer to the next character.
-    // =======================================================================
+    // =========================================================================
     char peekChar();
 
     // Used for reading the input file

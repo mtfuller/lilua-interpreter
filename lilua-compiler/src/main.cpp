@@ -10,6 +10,9 @@
 // =============================================================================
 #include <iostream>
 #include <string.h>
+#include "Parser.h"
+
+using namespace lilua_interpreter_project;
 
 const char APP_NAME[]         = "LiLuac";
 const char APP_VERSION[]      = "v0.1";

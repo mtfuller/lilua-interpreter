@@ -1,0 +1,22 @@
+if B1 then
+  if B2 then
+    S1
+  else
+    S2
+  end
+else
+  S3
+end
+
+B1
+GOFALSE ELSE1
+B2
+GOFALSE ELSE2
+S1
+GOTO 2
+S2          ELSE2
+GOTO 0
+GOTO 2
+S3          ELSE1
+GOTO 0
+HALT        END

@@ -35,6 +35,7 @@ namespace lilua_interpreter_project {
 
     // Checks to see if the input file is valid
     if (sourceFile->fail()) {
+      fnf_flag = true;
       std::cout << "Failed to open file..." << '\n';
       sourceFile->clear();
     }
@@ -42,6 +43,9 @@ namespace lilua_interpreter_project {
     // Initializes default values for data members
     err_flag = false;
     eof_flag = false;
+    line_n = 0;
+    col_n = 0;
+    lex_len = 0;
     current_token = UNKNOWN_TOKEN;
   }
 
@@ -49,7 +53,7 @@ namespace lilua_interpreter_project {
     delete sourceFile;
   }
 
-  LEXEME Scanner::lex() {
+  TOKEN Scanner::lex() {
     char c, n;
     int index = 0;
     current_token = UNKNOWN_TOKEN;
@@ -61,6 +65,8 @@ namespace lilua_interpreter_project {
     // non-whitespace character.
     c = skipWhitespace();
 
+    lex_len = 1;
+
     // Keep analyzing characters, one after another, until whitespace or
     // parenthesis are encountered.
     while (!isWhitespace(c)) {
@@ -69,7 +75,7 @@ namespace lilua_interpreter_project {
       if (eof_flag) {
         sourceFile->close();
         current_lexeme[0] = '\0';
-        return (LEXEME) {EOF_TOKEN, current_lexeme};
+        return (TOKEN) {EOF_TOKEN, current_lexeme};
       }
 
       // Conditional structure to test the current character
@@ -135,19 +141,35 @@ namespace lilua_interpreter_project {
     }
 
     // Return the LEXEME's token code and character string
-    return (LEXEME) {current_token, current_lexeme};
+    return (TOKEN) {current_token, current_lexeme};
+  }
+
+  TOKEN Scanner::peekLex() {
+    TOKEN next = lex();
+    for (unsigned int i = 0; i < lex_len; i++) sourceFile->unget();
+    return next;
   }
 
   char Scanner::getChar() {
     char c;
     // If the file stream cannot get a new character, we have reached the EOF
     if (!sourceFile->get(c)) eof_flag = true;
+    col_n++;
+    lex_len++;
     return c;
   }
 
   char Scanner::peekChar() {
     char c = sourceFile->peek();
     return c;
+  }
+
+  bool Scanner::isWhitespace(char c) {
+    if (c == '\n') {
+      line_n++;
+      col_n = 0;
+    }
+    return std::iscntrl(c) || std::isspace(c);
   }
 
   char Scanner::skipWhitespace() {
@@ -157,10 +179,6 @@ namespace lilua_interpreter_project {
       if (eof_flag) return -1;
     } while (isWhitespace(c));
     return c;
-  }
-
-  bool isWhitespace(char c) {
-    return std::iscntrl(c) || std::isspace(c);
   }
 
   bool isParen(char c) {

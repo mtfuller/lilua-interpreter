@@ -24,10 +24,10 @@ namespace lilua_interpreter_project {
   typedef int token_type;         // Data type used for all token codes
 
   // ===========================================================================
-  // struct LEXEME
+  // struct TOKEN
   // Contains the token code and the actual string of characters of a lexeme.
   // ===========================================================================
-  struct LEXEME {
+  struct TOKEN {
     token_type token;
     const char* lex;
   };
@@ -40,13 +40,6 @@ namespace lilua_interpreter_project {
     const char* name;
     token_type type;
   };
-
-  // ===========================================================================
-  // bool isWhitespace(char c)
-  // Returns true if the given character is a whitespace, which is a space, tab
-  // or some other control character. Otherwise, it will return false.
-  // ===========================================================================
-  bool isWhitespace(char c);
 
   // ===========================================================================
   // bool isParen(char c)
@@ -79,12 +72,33 @@ namespace lilua_interpreter_project {
     // Public Member Functions
     // =========================================================================
 
+    bool is_file_found() {return !fnf_flag;}
+
     // =========================================================================
-    // LEXEME lex()
-    // Returns a LEXEME (containing both a token and the actual string of chars)
+    // TOKEN lex()
+    // Returns a TOKEN (containing both a token and the actual string of chars)
     // of the next token in the scanner's input file.
     // =========================================================================
-    LEXEME lex();
+    TOKEN lex();
+
+    // =========================================================================
+    // TOKEN peekLex()
+    // Returns the next token from the input file, but does not move the cursor
+    // in the input file.
+    // =========================================================================
+    TOKEN peekLex();
+
+    // =========================================================================
+    // TOKEN getCol()
+    // Returns the current columb in the input file.
+    // =========================================================================
+    size_t getCol() {return col_n;}
+
+    // =========================================================================
+    // TOKEN getLine()
+    // Returns the current line of the input file.
+    // =========================================================================
+    size_t getLine() {return line_n;}
 
   private:
     // =========================================================================
@@ -101,6 +115,13 @@ namespace lilua_interpreter_project {
     // =========================================================================
     char peekChar();
 
+    // ===========================================================================
+    // bool isWhitespace(char c)
+    // Returns true if the given character is a whitespace, which is a space, tab
+    // or some other control character. Otherwise, it will return false.
+    // ===========================================================================
+    bool isWhitespace(char c);
+
     // =========================================================================
     // char skipWhitespace()
     // Returns the next non-whitespace character from the input file. If there
@@ -112,14 +133,17 @@ namespace lilua_interpreter_project {
     std::ifstream* sourceFile;
 
     // Flags to mark if an error or an endo-of-file is encountered
-    bool err_flag, eof_flag;
+    bool err_flag, eof_flag, fnf_flag;
 
     // Retains the current token code of the lexeme being analyzed
     token_type current_token;
 
     // A string to hold the current lexeme being evaluated
     char current_lexeme[LEXEME_BUFFER_SIZE];
+
+    // Data members used to keep track of the location in the file stream
+    unsigned int line_n, col_n, lex_len;
   };
-}
+};
 
 #endif

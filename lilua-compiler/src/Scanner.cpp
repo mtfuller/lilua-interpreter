@@ -9,7 +9,9 @@
 // This file is the implementation of the scanner class.
 // =============================================================================
 #include <iostream>
+#include <cassert>
 #include <string.h>
+#include <string>
 #include <cctype>
 #include "Scanner.h"
 #include "lilua_symbol.h"
@@ -44,28 +46,37 @@ namespace lilua_interpreter_project {
     err_flag = false;
     eof_flag = false;
     line_n = 0;
+    prev_col_n = 0;
     col_n = 0;
     lex_len = 0;
+    total_char = 0;
     current_token = UNKNOWN_TOKEN;
+    input_line = new std::string();
+    getNewLine();
   }
 
   Scanner::~Scanner() {
     delete sourceFile;
+    delete input_line;
   }
 
   TOKEN Scanner::lex() {
     char c, n;
+    bool eol_flag = false;
     int index = 0;
     current_token = UNKNOWN_TOKEN;
+
+    //if (line_ptr == input_line->end()) getNewLine();
 
     // Erase the contents of current_lexeme
     memset (current_lexeme,' ',LEXEME_BUFFER_SIZE);
 
+    std::cout << "DISTANCE: " << distance(line_ptr, input_line->end()) << '\n';
+
+
     // Keep getting new characters from the file until getChar() will return a
     // non-whitespace character.
     c = skipWhitespace();
-
-    lex_len = 1;
 
     // Keep analyzing characters, one after another, until whitespace or
     // parenthesis are encountered.
@@ -113,6 +124,9 @@ namespace lilua_interpreter_project {
         current_token = LEFT_PAREN_TOKEN;
       } else if (c == ')') {
         current_token = RIGHT_PAREN_TOKEN;
+      } else if (c == -1) {
+        eol_flag = true;
+        break;
       }
 
       // Append the current character to the LEXEME's string of characters
@@ -120,12 +134,11 @@ namespace lilua_interpreter_project {
 
       n = peekChar();
       if (isParen(c) || isParen(n) || isWhitespace(n)) break;
-
       // Get the next character
       c = getChar();
     }
 
-
+    if (eol_flag || line_ptr == input_line->end()) getNewLine();
 
     // If the lexical analysis process found a keyword, we need to figure out
     // what keyword it is.
@@ -136,8 +149,10 @@ namespace lilua_interpreter_project {
 
       // Get the token code of the keyword
       current_token = keyword_bin_search(temp.c_str());
+    }
 
-
+    if (current_token == -1) {
+      return (TOKEN) {ERR_TOKEN, "\0"};
     }
 
     // Return the LEXEME's token code and character string
@@ -145,34 +160,45 @@ namespace lilua_interpreter_project {
   }
 
   TOKEN Scanner::peekLex() {
+    std::streampos initial_file_pos = sourceFile->tellg();
+    unsigned int initial_line = line_n;
+    size_t initial_col = getCol();
+    std::string::iterator initial_line_pos = line_ptr;
+
     TOKEN next = lex();
-    for (unsigned int i = 0; i < lex_len; i++) sourceFile->unget();
+
+    if (initial_line == line_n) {
+      line_ptr = initial_line_pos;
+    } else {
+      sourceFile->seekg (initial_file_pos);
+      line_n = initial_line;
+      for (size_t i = 0; i < initial_col; i++) ++line_ptr;
+    }
     return next;
   }
 
   char Scanner::getChar() {
-    char c;
-    // If the file stream cannot get a new character, we have reached the EOF
-    if (!sourceFile->get(c)) eof_flag = true;
-    col_n++;
-    lex_len++;
-    return c;
+    assert(input_line != NULL);
+    char temp = *line_ptr;
+    if (line_ptr < input_line->end()) ++line_ptr;
+    else {
+      line_ptr = input_line->end();
+      return -1;
+    }
+    return temp;
   }
 
   char Scanner::peekChar() {
-    char c = sourceFile->peek();
-    return c;
+    assert(input_line != NULL);
+    return *line_ptr;
   }
 
   bool Scanner::isWhitespace(char c) {
-    if (c == '\n') {
-      line_n++;
-      col_n = 0;
-    }
     return std::iscntrl(c) || std::isspace(c);
   }
 
   char Scanner::skipWhitespace() {
+    assert(input_line != NULL);
     char c;
     do {
       c = getChar();
@@ -185,16 +211,24 @@ namespace lilua_interpreter_project {
     return c == '(' || c == ')';
   }
 
+  void Scanner::getNewLine() {
+    assert(line_ptr <= input_line->end());
+    getline(*sourceFile, *input_line);
+    line_ptr = input_line->begin();
+    ++line_n;
+    if (sourceFile->eof()) eof_flag = true;
+  }
+
   token_type keyword_bin_search(const char* key) {
     // Initialize bounds
-    size_t begin = 0;
-    size_t end = KEYWORD_SIZE - 1;
+    int begin = 0;
+    int end = KEYWORD_SIZE - 1;
 
     // Keep iterating until the bounds are too small
     while (begin <= end) {
 
       // Find midpoint
-      size_t mid = (begin + end) / 2;
+      int mid = (begin + end) / 2;
 
       // Compare to see if the keyword comes before the current element
       int comp = strcmp(key, keywordTable[mid].name);

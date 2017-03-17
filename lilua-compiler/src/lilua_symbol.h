@@ -10,6 +10,7 @@
 // =============================================================================
 
 // TOKEN DEFINITIONS:
+#define ERR_TOKEN               -2
 #define EOF_TOKEN               -1
 #define UNKNOWN_TOKEN           0
 #define LEFT_PAREN_TOKEN        1
@@ -40,3 +41,22 @@
 #define THEN_KEYWORD            24
 #define UNTIL_KEYWORD           25
 #define WHILE_KEYWORD           26
+
+// INSTRUCTION SET DEFINITONS
+#define PUSH_OPP		  5000
+#define POP_OPP			  5001
+#define ASSIGN_OPP		5002
+#define ADD_OPP			  5003
+#define SUB_OPP			  5004
+#define MULT_OPP		  5005
+#define DIV_OPP			  5006
+#define GT_OPP        5007
+#define GE_OPP			  5008
+#define LT_OPP			  5009
+#define LE_OPP			  5010
+#define EQ_OPP			  5011
+#define NOT_EQ_OPP		5012
+#define GOTO_OPP		  5013
+#define GOFALSE_OPP		5014
+#define HALT_OPP		  5015
+#define PRINT_OPP		  5016

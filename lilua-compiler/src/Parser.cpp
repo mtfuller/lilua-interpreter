@@ -19,6 +19,16 @@ namespace lilua_interpreter_project {
     lex.token == WHILE_KEYWORD;
   }
 
+  bool assertToken(token_type expectedCode, Parser* parser) {
+    TOKEN token = parser->lexicalAnalyzer->lex();
+    if (token.token == expectedCode) return true;
+    else {
+      parser->print_err_pos();
+      std::cout << "Unexpected token. Expected \"" << expectedCode << "\"\n";
+    }
+    return false;
+  }
+
   Parser::Parser(const char *source_file, const char *output_file) {
     lexicalAnalyzer = new Scanner(source_file);
     outputFile = new std::ofstream(output_file);
@@ -37,10 +47,11 @@ namespace lilua_interpreter_project {
       // Run parse program
       if (parse_prgm()) {
         std::cout << "SUCCESS!!! File Pos: " << file_pos << '\n';
+        outputFile->close();
         return true;
       } else {
-        std::cout << "ERROR:" << lexicalAnalyzer->getLine() << ":" <<
-          lexicalAnalyzer->getCol() << ": Parsing Error" << '\n';
+        print_err_pos();
+        std::cout << "Parsing Error" << '\n';
       }
     } else {
       std::cout << "ERROR: File iS NOT found" << '\n';
@@ -50,19 +61,15 @@ namespace lilua_interpreter_project {
 
   bool Parser::parse_prgm() {
     std::cout << "Let\'s Begin!" << '\n';
-    current = lexicalAnalyzer->lex();
-    if (current.token != FUNCTION_KEYWORD) return false;
-    current = lexicalAnalyzer->lex();
-    if (current.token != ID) return false;
-    current = lexicalAnalyzer->lex();
-    if (current.token != LEFT_PAREN_TOKEN) return false;
-    current = lexicalAnalyzer->lex();
-    if (current.token != RIGHT_PAREN_TOKEN) return false;
+
+    if (!assertToken(FUNCTION_KEYWORD, this)) return false;
+    if (!assertToken(ID, this)) return false;
+    if (!assertToken(LEFT_PAREN_TOKEN, this)) return false;
+    if (!assertToken(RIGHT_PAREN_TOKEN, this)) return false;
 
     if (!parse_block()) return false;
 
-    current = lexicalAnalyzer->lex();
-    if (current.token != END_KEYWORD) return false;
+    if (!assertToken(END_KEYWORD, this)) return false;
 
     std::cout << "LINE "  << file_pos << ": " << "HALT" << '\n';
     file_pos++;
@@ -72,44 +79,38 @@ namespace lilua_interpreter_project {
 
   bool Parser::parse_block() {
     TOKEN next;
-    size_of_block = 0;
-    do {
-      size_of_block++;
-      if (!parse_statement()) return false;
-      next = lexicalAnalyzer->peekLex();
-    } while (isStatement(next));
+
+    if (!parse_statement()) return false;
+
+    next = lexicalAnalyzer->peekLex();
+    if (isStatement(next)) parse_block();
+
     return true;
   }
 
   bool Parser::parse_statement() {
     TOKEN next = lexicalAnalyzer->peekLex();
-    if (next.token == ID) {
-      return parse_assignment_stmt();
-    } else if (next.token == IF_KEYWORD) {
-      return parse_if_stmt();
-    } else if (next.token == PRINT_KEYWORD) {
-      return parse_print_stmt();
-    } else if (next.token == WHILE_KEYWORD) {
-      return parse_while_stmt();
-    } else if (next.token == REPEAT_KEYWORD) {
-      return parse_repeat_stmt();
-    } else if (next.token == END_KEYWORD) {
-      return true;
-    } else {
-      return false;
-    }
+    if (next.token == ID) return parse_assignment_stmt();
+    else if (next.token == IF_KEYWORD) return parse_if_stmt();
+    else if (next.token == PRINT_KEYWORD) return parse_print_stmt();
+    else if (next.token == WHILE_KEYWORD) return parse_while_stmt();
+    else if (next.token == REPEAT_KEYWORD) return parse_repeat_stmt();
+    else if (next.token == END_KEYWORD) return true;
+    else return false;
   }
 
   bool Parser::parse_assignment_stmt() {
     TOKEN id = lexicalAnalyzer->lex();
-    if (id.token != ID) return false;
+    if (id.token != ID) {
+      std::cout << "Unexpected token. Expected an ID, but received a\"" << id.token << "\"." << '\n';
+      return false;
+    }
     std::cout << "LINE "  << file_pos << ": " << "PUSH " << id.lex << '\n';
     file_pos++;
 
-    TOKEN op = lexicalAnalyzer->lex();
-    if (op.token != ASSIGNMENT_OPERATOR) return false;
+    if (!assertToken(ASSIGNMENT_OPERATOR, this)) return false;
 
-    arithemetic_expression();
+    if (!arithemetic_expression()) return false;
 
     std::cout << "LINE "  << file_pos << ": " << "ASSIGN OP" << '\n';
     file_pos++;
@@ -117,13 +118,11 @@ namespace lilua_interpreter_project {
   }
 
   bool Parser::parse_if_stmt() {
-    current = lexicalAnalyzer->lex();
-    if (current.token != IF_KEYWORD) return false;
+    if (!assertToken(IF_KEYWORD, this)) return false;
 
     if (!boolean_expression()) return false;
 
-    current = lexicalAnalyzer->lex();
-    if (current.token != THEN_KEYWORD) return false;
+    if (!assertToken(THEN_KEYWORD, this)) return false;
 
     size_t cond = file_pos;
     std::cout << "LINE "  << file_pos << ": " << "GOFALSE " << "LATER" << '\n';
@@ -135,8 +134,7 @@ namespace lilua_interpreter_project {
     std::cout << "LINE "  << file_pos << ": " << "GOTO " << "END" << '\n';
     file_pos++;
 
-    current = lexicalAnalyzer->lex();
-    if (current.token != ELSE_KEYWORD) return false;
+    if (!assertToken(ELSE_KEYWORD, this)) return false;
 
     if (!parse_block()) return false;
 
@@ -144,8 +142,7 @@ namespace lilua_interpreter_project {
     std::cout << "LINE "  << file_pos << ": " << "GOTO " << 0 << '\n';
     file_pos++;
 
-    current = lexicalAnalyzer->lex();
-    if (current.token != END_KEYWORD) return false;
+    if (!assertToken(END_KEYWORD, this)) return false;
 
     std::cout << "<<< On line " << cond << " GOFALSE "
       << jmp2-cond << " >>>\n";
@@ -154,14 +151,12 @@ namespace lilua_interpreter_project {
   }
 
   bool Parser::parse_while_stmt() {
-    current = lexicalAnalyzer->lex();
-    if (current.token != WHILE_KEYWORD) return false;
+    if (!assertToken(WHILE_KEYWORD, this)) return false;
     size_t begin = file_pos;
 
     if (!boolean_expression()) return false;
 
-    current = lexicalAnalyzer->lex();
-    if (current.token != DO_KEYWORD) return false;
+    if (!assertToken(DO_KEYWORD, this)) return false;
 
     size_t cond = file_pos;
     std::cout << "LINE "  << file_pos << ": " << "GOFALSE " << "LATER" << '\n';
@@ -169,8 +164,7 @@ namespace lilua_interpreter_project {
 
     if (!parse_block()) return false;
 
-    current = lexicalAnalyzer->lex();
-    if (current.token != END_KEYWORD) return false;
+    if (!assertToken(END_KEYWORD, this)) return false;
 
     std::cout << "LINE "  << file_pos << ": " << "GOTO " << file_pos-begin << '\n';
     file_pos++;
@@ -181,14 +175,12 @@ namespace lilua_interpreter_project {
   }
 
   bool Parser::parse_repeat_stmt() {
-    current = lexicalAnalyzer->lex();
-    if (current.token != REPEAT_KEYWORD) return false;
+    if (!assertToken(REPEAT_KEYWORD, this)) return false;
     size_t begin = file_pos;
 
     if (!parse_block()) return false;
 
-    current = lexicalAnalyzer->lex();
-    if (current.token != UNTIL_KEYWORD) return false;
+    if (!assertToken(UNTIL_KEYWORD, this)) return false;
 
     if (!boolean_expression()) return false;
 
@@ -199,15 +191,20 @@ namespace lilua_interpreter_project {
   }
 
   bool Parser::parse_print_stmt() {
-    current = lexicalAnalyzer->lex();
-    if (current.token != PRINT_KEYWORD) return false;
-    current = lexicalAnalyzer->lex();
-    if (current.token != LEFT_PAREN_TOKEN) return false;
+    print_err_pos();
+    if (!assertToken(PRINT_KEYWORD, this)) return false;
+    print_err_pos();
+    if (!assertToken(LEFT_PAREN_TOKEN, this)) return false;
+    print_err_pos();
 
     if (!arithemetic_expression()) return false;
+    print_err_pos();
+    std::cout << "TEST2" << '\n';
+    TOKEN hello = lexicalAnalyzer->lex();
+    print_err_pos();
+    std::cout << "TOKEN: " << hello.token << '\n';
 
-    current = lexicalAnalyzer->lex();
-    if (current.token != RIGHT_PAREN_TOKEN) return false;
+    if (!assertToken(RIGHT_PAREN_TOKEN, this)) return false;
 
     std::cout << "LINE "  << file_pos << ": " << "PRINT" << '\n';
     file_pos++;
@@ -247,6 +244,8 @@ namespace lilua_interpreter_project {
       std::cout << "LINE "  << file_pos << ": " << "!= OPP" << '\n';
       file_pos++;
     } else {
+      print_err_pos();
+      std::cout << "Invalid boolean operator." << '\n';
       return false;
     }
     return true;
@@ -255,9 +254,8 @@ namespace lilua_interpreter_project {
   bool Parser::arithemetic_expression() {
     TOKEN next;
     current = lexicalAnalyzer->lex();
-    if (current.token != ID && current.token != LITERAL_INTEGER)
-      return false;
-    std::cout << "LINE "  << file_pos << ": " << "PUSH " << current.lex << '\n';
+    if (current.token != ID && current.token != LITERAL_INTEGER) return false;
+    std::cout << "LINE " << file_pos << ": " << "PUSH " << current.lex << '\n';
     file_pos++;
     // peek token
     next = lexicalAnalyzer->peekLex();
@@ -284,10 +282,44 @@ namespace lilua_interpreter_project {
       std::cout << "LINE "  << file_pos << ": " << "DIV OP" << '\n';
       file_pos++;
     } else {
+      print_err_pos();
+      std::cout << "Invalid boolean operator." << '\n';
       return false;
     }
     return true;
   }
 
+  void Parser::print_err_pos() {
+    std::cout << "ERROR:" << lexicalAnalyzer->getLine() << ":" <<
+      lexicalAnalyzer->getCol()+1 << ": ";
+  }
+
+  void Parser::addInstruction(token_type instr=0, token_type val_t=0,
+    int val=0) {
+
+
+
+      instr -= PUSH_OPP;
+      *outputFile << instr << ' ';
+
+      switch (val_t) {
+        case 0:
+          *outputFile << 0 << ' ';;
+          break;
+        case ID:
+          *outputFile << 3 << ' ';;
+          break;
+        case LITERAL_INTEGER:
+          *outputFile << 2 << ' ';;
+          break;
+        default:
+          print_err_pos();
+          std::cout << "Incorrect type code" << '\n';
+      }
+
+      *outputFile << val;
+
+      *outputFile << '\n';
+  }
 
 };

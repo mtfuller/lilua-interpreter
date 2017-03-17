@@ -38,7 +38,11 @@ namespace lilua_interpreter_project {
     bool relative_op(TOKEN op);
     bool arithemetic_expression();
     bool arithemetic_op(TOKEN op);
-    //void addInstruction(BYTE instr_code, token_type value_type, int value);
+    void print_err_pos();
+    void addInstruction(token_type instr, token_type val_t, int val);
+
+    friend bool assertToken(token_type expectedCode, Parser* parser);
+
     TOKEN current;
     Scanner* lexicalAnalyzer;
     std::ofstream* outputFile;

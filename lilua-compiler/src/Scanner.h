@@ -92,7 +92,7 @@ namespace lilua_interpreter_project {
     // TOKEN getCol()
     // Returns the current columb in the input file.
     // =========================================================================
-    size_t getCol() {return col_n;}
+    size_t getCol() {return distance(input_line->begin(),line_ptr);}
 
     // =========================================================================
     // TOKEN getLine()
@@ -105,6 +105,9 @@ namespace lilua_interpreter_project {
     // char getChar()
     // Returns the next character in the input file. This function also moves
     // the file pointer to the next character.
+    // Preconditions: input_line is not empty
+    // Postconditions: The next character in the line is returned, -1 is
+    // returned if the end of the line is reached. The iterator is moved.
     // =========================================================================
     char getChar();
 
@@ -112,6 +115,9 @@ namespace lilua_interpreter_project {
     // char peekChar()
     // Returns the next character in the input file. This function does NOT
     // move the file pointer to the next character.
+    // Preconditions: input_line is not empty
+    // Postconditions: The next character in the line is returned, -1 is
+    // returned if the end of the line is reached. The iterator is NOT moved.
     // =========================================================================
     char peekChar();
 
@@ -126,8 +132,17 @@ namespace lilua_interpreter_project {
     // char skipWhitespace()
     // Returns the next non-whitespace character from the input file. If there
     // are no more characters, -1 is returned.
+    // Preconditions: input_line is not empty
     // =========================================================================
     char skipWhitespace();
+
+    // =========================================================================
+    // void getNewLine()
+    // Returns the next non-whitespace character from the input file. If there
+    // are no more characters, -1 is returned.
+    // Precondition: line_ptr has reached the end of the line.
+    // =========================================================================
+    void getNewLine();
 
     // Used for reading the input file
     std::ifstream* sourceFile;
@@ -142,7 +157,11 @@ namespace lilua_interpreter_project {
     char current_lexeme[LEXEME_BUFFER_SIZE];
 
     // Data members used to keep track of the location in the file stream
-    unsigned int line_n, col_n, lex_len;
+    unsigned int line_n, col_n, lex_len, prev_col_n, total_char;
+
+    std::string::iterator line_ptr;
+    std::string *input_line;
+
   };
 };
 

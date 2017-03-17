@@ -51,6 +51,7 @@ int main(int argc, char const *argv[]) {
     user_err();
     return -1;
   }
+
   const char* flag = argv[1];
   if (checkFlag(flag, "-v")) {
     std::cout << APP_NAME << " " << APP_VERSION << "\n\n";

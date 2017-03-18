@@ -65,13 +65,27 @@ namespace lilua_interpreter_project {
     // =========================================================================
     // Constructors/Destructor
     // =========================================================================
+
+    // =========================================================================
+    // Scanner (const char *fileStr)
+    // Takes in a string (fileStr) of the source file's directory. Creates a new
+    // scanner object and checks to see if the file exists. If not, it prints
+    // out a message to the output stream, alerting that the file is not found.
+    // After creating the scanner, the lex() function can be used to get the
+    // next token in the input file.
+    // =========================================================================
     Scanner (const char *fileStr);
+
     ~Scanner ();
 
     // =========================================================================
     // Public Member Functions
     // =========================================================================
 
+    // =========================================================================
+    // bool is_file_found()
+    // Returns true if the given input file is not found.
+    // =========================================================================
     bool is_file_found() {return !fnf_flag;}
 
     // =========================================================================
@@ -99,6 +113,10 @@ namespace lilua_interpreter_project {
     // =========================================================================
     bool eof() {return eof_flag;}
 
+  private:
+    // =========================================================================
+    // Private Member Functions
+    // =========================================================================
 
     // =========================================================================
     // char getChar()
@@ -143,30 +161,30 @@ namespace lilua_interpreter_project {
     // =========================================================================
     void getNewLine();
 
-    token_type evaluateChar(char c, token_type current_token, bool eol_flag);
+    // =========================================================================
+    // Private Data Members
+    // =========================================================================
 
-
-private:
     // Used for reading the input file
     std::ifstream* sourceFile;
 
     // Flags to mark if an error or an endo-of-file is encountered
     bool err_flag, eof_flag, fnf_flag;
 
-    // Retains the current token code of the lexeme being analyzed
+    // Retains the current token code of the current lexeme being analyzed
     token_type current_token;
 
     // A string to hold the current lexeme being evaluated
     char current_lexeme[LEXEME_BUFFER_SIZE];
 
     // Data members used to keep track of the location in the file stream
-    unsigned int line_n, col_n, lex_len, prev_col_n, total_char;
+    unsigned int line_n, col_n;
 
-    TOKEN curr_token;
-
-    std::string::iterator line_ptr;
+    // String to hold the current line in the input file
     std::string *input_line;
 
+    // Iterator pointing to current character in input_line
+    std::string::iterator line_ptr;
   };
 };
 

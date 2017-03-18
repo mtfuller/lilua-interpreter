@@ -332,10 +332,11 @@ int main() {
     if (!keyword_test("do", DO_KEYWORD)) return -1;
     if (!keyword_test("while", WHILE_KEYWORD)) return -1;
     if (!keyword_test("notinthetable", -1)) return -1;
+    if (!keyword_test("aaaaa", -1)) return -1;
+    if (!keyword_test("zzzzz", -1)) return -1;
 
     if (!test1()) return -1;
     if (!test2()) return -1;
     if (!test3()) return -1;
-
     return 0;
 }

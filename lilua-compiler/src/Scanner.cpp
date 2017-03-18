@@ -62,32 +62,19 @@ namespace lilua_interpreter_project {
 
   TOKEN Scanner::lex() {
     char c, n;
-    bool eol_flag = false;
     int index = 0;
     current_token = UNKNOWN_TOKEN;
 
-    //if (line_ptr == input_line->end()) getNewLine();
-
-    // Erase the contents of current_lexeme
-    memset (current_lexeme,' ',LEXEME_BUFFER_SIZE);
-
-    std::cout << "DISTANCE: " << distance(line_ptr, input_line->end()) << '\n';
-
+    memset (current_lexeme,' ',10);
 
     // Keep getting new characters from the file until getChar() will return a
     // non-whitespace character.
-    c = skipWhitespace();
+    skipWhitespace();
 
-    // Keep analyzing characters, one after another, until whitespace or
-    // parenthesis are encountered.
-    while (!isWhitespace(c)) {
-      // Check if we have reached the end of file. If we have, close the input
-      // file and return a EOF token
-      if (eof_flag) {
-        sourceFile->close();
-        current_lexeme[0] = '\0';
-        return (TOKEN) {EOF_TOKEN, current_lexeme};
-      }
+    if (eof()) return (TOKEN) {EOF_TOKEN, '\0'};
+
+    do {
+      c = getChar();
 
       // Conditional structure to test the current character
       if (std::isalpha(c)) {
@@ -125,7 +112,6 @@ namespace lilua_interpreter_project {
       } else if (c == ')') {
         current_token = RIGHT_PAREN_TOKEN;
       } else if (c == -1) {
-        eol_flag = true;
         break;
       }
 
@@ -134,11 +120,8 @@ namespace lilua_interpreter_project {
 
       n = peekChar();
       if (isParen(c) || isParen(n) || isWhitespace(n)) break;
-      // Get the next character
-      c = getChar();
-    }
 
-    if (eol_flag || line_ptr == input_line->end()) getNewLine();
+    } while(!isWhitespace(c));
 
     // If the lexical analysis process found a keyword, we need to figure out
     // what keyword it is.
@@ -151,40 +134,19 @@ namespace lilua_interpreter_project {
       current_token = keyword_bin_search(temp.c_str());
     }
 
-    if (current_token == -1) {
-      return (TOKEN) {ERR_TOKEN, "\0"};
-    }
+    TOKEN nextToken;
+    nextToken.token = current_token;
+    strcpy(nextToken.lex, current_lexeme);
 
-    // Return the LEXEME's token code and character string
-    return (TOKEN) {current_token, current_lexeme};
-  }
-
-  TOKEN Scanner::peekLex() {
-    std::streampos initial_file_pos = sourceFile->tellg();
-    unsigned int initial_line = line_n;
-    size_t initial_col = getCol();
-    std::string::iterator initial_line_pos = line_ptr;
-
-    TOKEN next = lex();
-
-    if (initial_line == line_n) {
-      line_ptr = initial_line_pos;
-    } else {
-      sourceFile->seekg (initial_file_pos);
-      line_n = initial_line;
-      for (size_t i = 0; i < initial_col; i++) ++line_ptr;
-    }
-    return next;
+    return nextToken;
   }
 
   char Scanner::getChar() {
     assert(input_line != NULL);
+    if (eof_flag) return -1;
     char temp = *line_ptr;
     if (line_ptr < input_line->end()) ++line_ptr;
-    else {
-      line_ptr = input_line->end();
-      return -1;
-    }
+    else getNewLine();
     return temp;
   }
 
@@ -197,14 +159,15 @@ namespace lilua_interpreter_project {
     return std::iscntrl(c) || std::isspace(c);
   }
 
-  char Scanner::skipWhitespace() {
+  void Scanner::skipWhitespace() {
     assert(input_line != NULL);
     char c;
-    do {
+    c = peekChar();
+    while (isWhitespace(c)){
       c = getChar();
-      if (eof_flag) return -1;
-    } while (isWhitespace(c));
-    return c;
+      if (c == -1) return;
+      c = peekChar();
+    }
   }
 
   bool isParen(char c) {
@@ -212,11 +175,58 @@ namespace lilua_interpreter_project {
   }
 
   void Scanner::getNewLine() {
-    assert(line_ptr <= input_line->end());
+    if (sourceFile->eof()) {
+      eof_flag = true;
+      if (sourceFile->is_open()) sourceFile->close();
+      return;
+    }
     getline(*sourceFile, *input_line);
     line_ptr = input_line->begin();
     ++line_n;
-    if (sourceFile->eof()) eof_flag = true;
+  }
+
+  token_type Scanner::evaluateChar(char c, token_type current_token, bool eol_flag) {
+    // Conditional structure to test the current character
+    if (std::isalpha(c)) {
+      if (current_token == ID) {
+        current_token = UKNOWN_KEYWORD;
+      } else if (current_token != UKNOWN_KEYWORD) {
+        current_token = ID;
+      }
+    } else if (std::isdigit(c)) {
+      current_token = LITERAL_INTEGER;
+    } else if (c == '=') {
+      if (current_token == UNKNOWN_TOKEN) {
+        current_token = ASSIGNMENT_OPERATOR;
+      } else if (current_token == ASSIGNMENT_OPERATOR) {
+        current_token = EQ_OPERATOR;
+      } else if (current_token == LT_OPERATOR) {
+        current_token = LE_OPERATOR;
+      } else if (current_token == GT_OPERATOR) {
+        current_token = GE_OPERATOR;
+      }
+    } else if (c == '<') {
+      current_token = LT_OPERATOR;
+    } else if (c == '>') {
+      current_token = GT_OPERATOR;
+    } else if (c == '+') {
+      current_token = ADD_OPERATOR;
+    } else if (c == '-') {
+      current_token = SUB_OPERATOR;
+    } else if (c == '*') {
+      current_token = MULT_OPERATOR;
+    } else if (c == '/') {
+      current_token = DIV_OPERATOR;
+    } else if (c == '(') {
+      current_token = LEFT_PAREN_TOKEN;
+    } else if (c == ')') {
+      current_token = RIGHT_PAREN_TOKEN;
+    } else if (c == -1) {
+      eol_flag = true;
+      return current_token;
+    }
+
+    return current_token;
   }
 
   token_type keyword_bin_search(const char* key) {

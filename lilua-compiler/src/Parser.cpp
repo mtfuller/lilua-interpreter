@@ -20,7 +20,7 @@ namespace lilua_interpreter_project {
   }
 
   bool assertToken(token_type expectedCode, Parser* parser) {
-    TOKEN token = parser->lexicalAnalyzer->lex();
+    TOKEN token = parser->getToken();
     if (token.token == expectedCode) return true;
     else {
       parser->print_err_pos();
@@ -44,6 +44,9 @@ namespace lilua_interpreter_project {
   bool Parser::parse() {
     // See if source file exists
     if (lexicalAnalyzer->is_file_found()) {
+      // Get first token
+      current = lexicalAnalyzer->lex();
+
       // Run parse program
       if (parse_prgm()) {
         std::cout << "SUCCESS!!! File Pos: " << file_pos << '\n';
@@ -57,6 +60,10 @@ namespace lilua_interpreter_project {
       std::cout << "ERROR: File iS NOT found" << '\n';
     }
     return false;
+  }
+
+  bool Parser::eof() {
+    return lexicalAnalyzer->eof();
   }
 
   bool Parser::parse_prgm() {
@@ -82,14 +89,14 @@ namespace lilua_interpreter_project {
 
     if (!parse_statement()) return false;
 
-    next = lexicalAnalyzer->peekLex();
+    next = nextToken();
     if (isStatement(next)) parse_block();
 
     return true;
   }
 
   bool Parser::parse_statement() {
-    TOKEN next = lexicalAnalyzer->peekLex();
+    TOKEN next = nextToken();
     if (next.token == ID) return parse_assignment_stmt();
     else if (next.token == IF_KEYWORD) return parse_if_stmt();
     else if (next.token == PRINT_KEYWORD) return parse_print_stmt();
@@ -100,7 +107,7 @@ namespace lilua_interpreter_project {
   }
 
   bool Parser::parse_assignment_stmt() {
-    TOKEN id = lexicalAnalyzer->lex();
+    TOKEN id = getToken();
     if (id.token != ID) {
       std::cout << "Unexpected token. Expected an ID, but received a\"" << id.token << "\"." << '\n';
       return false;
@@ -198,11 +205,6 @@ namespace lilua_interpreter_project {
     print_err_pos();
 
     if (!arithemetic_expression()) return false;
-    print_err_pos();
-    std::cout << "TEST2" << '\n';
-    TOKEN hello = lexicalAnalyzer->lex();
-    print_err_pos();
-    std::cout << "TOKEN: " << hello.token << '\n';
 
     if (!assertToken(RIGHT_PAREN_TOKEN, this)) return false;
 
@@ -213,11 +215,11 @@ namespace lilua_interpreter_project {
   }
 
   bool Parser::boolean_expression() {
-    current = lexicalAnalyzer->lex();
+    current = getToken();
     std::cout << "LINE "  << file_pos << ": " << "PUSH " << current.lex << '\n';
     file_pos++;
-    TOKEN op = lexicalAnalyzer->lex();
-    current = lexicalAnalyzer->lex();
+    TOKEN op = getToken();
+    current = getToken();
     std::cout << "LINE "  << file_pos << ": " << "PUSH " << current.lex << '\n';
     file_pos++;
     if (!relative_op(op)) return false;
@@ -226,22 +228,22 @@ namespace lilua_interpreter_project {
 
   bool Parser::relative_op(TOKEN op) {
     if (op.token == LE_OPERATOR) {
-      std::cout << "LINE "  << file_pos << ": " << "<= OP" << '\n';
+      std::cout << "LINE " << file_pos << ": " << "<= OP" << '\n';
       file_pos++;
     } else if (op.token == LT_OPERATOR) {
-      std::cout << "LINE "  << file_pos << ": " << "< OP" << '\n';
+      std::cout << "LINE " << file_pos << ": " << "< OP" << '\n';
       file_pos++;
     } else if (op.token == GE_OPERATOR) {
-      std::cout << "LINE "  << file_pos << ": " << ">= OP" << '\n';
+      std::cout << "LINE " << file_pos << ": " << ">= OP" << '\n';
       file_pos++;
     } else if (op.token == GT_OPERATOR) {
-      std::cout << "LINE "  << file_pos << ": " << "> OP" << '\n';
+      std::cout << "LINE " << file_pos << ": " << "> OP" << '\n';
       file_pos++;
     } else if (op.token == EQ_OPERATOR) {
-      std::cout << "LINE "  << file_pos << ": " << "== OPP" << '\n';
+      std::cout << "LINE " << file_pos << ": " << "== OPP" << '\n';
       file_pos++;
     } else if (op.token == NE_OPERATOR) {
-      std::cout << "LINE "  << file_pos << ": " << "!= OPP" << '\n';
+      std::cout << "LINE " << file_pos << ": " << "!= OPP" << '\n';
       file_pos++;
     } else {
       print_err_pos();
@@ -258,7 +260,7 @@ namespace lilua_interpreter_project {
     std::cout << "LINE " << file_pos << ": " << "PUSH " << current.lex << '\n';
     file_pos++;
     // peek token
-    next = lexicalAnalyzer->peekLex();
+    //next = lexicalAnalyzer->peekLex();
     if (next.token == ADD_OPERATOR || next.token == SUB_OPERATOR ||
         next.token == MULT_OPERATOR || next.token == DIV_OPERATOR) {
           TOKEN op = lexicalAnalyzer->lex();
@@ -292,6 +294,16 @@ namespace lilua_interpreter_project {
   void Parser::print_err_pos() {
     std::cout << "ERROR:" << lexicalAnalyzer->getLine() << ":" <<
       lexicalAnalyzer->getCol()+1 << ": ";
+  }
+
+  TOKEN Parser::getToken() {
+    TOKEN temp = current;
+    current = lexicalAnalyzer->lex();
+    return temp;
+  }
+
+  TOKEN Parser::nextToken() {
+    return current;
   }
 
   void Parser::addInstruction(token_type instr=0, token_type val_t=0,

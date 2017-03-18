@@ -25,6 +25,9 @@ namespace lilua_interpreter_project {
     Parser(const char *sourceFile, const char *outputFile);
     ~Parser();
     bool parse();
+    TOKEN getToken();
+    TOKEN nextToken();
+    bool eof();
   private:
     bool parse_prgm();
     bool parse_block();
@@ -39,6 +42,7 @@ namespace lilua_interpreter_project {
     bool arithemetic_expression();
     bool arithemetic_op(TOKEN op);
     void print_err_pos();
+
     void addInstruction(token_type instr, token_type val_t, int val);
 
     friend bool assertToken(token_type expectedCode, Parser* parser);

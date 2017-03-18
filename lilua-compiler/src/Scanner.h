@@ -29,7 +29,7 @@ namespace lilua_interpreter_project {
   // ===========================================================================
   struct TOKEN {
     token_type token;
-    const char* lex;
+    char lex[15];
   };
 
   // ===========================================================================
@@ -82,13 +82,6 @@ namespace lilua_interpreter_project {
     TOKEN lex();
 
     // =========================================================================
-    // TOKEN peekLex()
-    // Returns the next token from the input file, but does not move the cursor
-    // in the input file.
-    // =========================================================================
-    TOKEN peekLex();
-
-    // =========================================================================
     // TOKEN getCol()
     // Returns the current columb in the input file.
     // =========================================================================
@@ -100,7 +93,13 @@ namespace lilua_interpreter_project {
     // =========================================================================
     size_t getLine() {return line_n;}
 
-  private:
+    // =========================================================================
+    // TOKEN getLine()
+    // Returns the current line of the input file.
+    // =========================================================================
+    bool eof() {return eof_flag;}
+
+
     // =========================================================================
     // char getChar()
     // Returns the next character in the input file. This function also moves
@@ -134,7 +133,7 @@ namespace lilua_interpreter_project {
     // are no more characters, -1 is returned.
     // Preconditions: input_line is not empty
     // =========================================================================
-    char skipWhitespace();
+    void skipWhitespace();
 
     // =========================================================================
     // void getNewLine()
@@ -144,6 +143,10 @@ namespace lilua_interpreter_project {
     // =========================================================================
     void getNewLine();
 
+    token_type evaluateChar(char c, token_type current_token, bool eol_flag);
+
+
+private:
     // Used for reading the input file
     std::ifstream* sourceFile;
 
@@ -158,6 +161,8 @@ namespace lilua_interpreter_project {
 
     // Data members used to keep track of the location in the file stream
     unsigned int line_n, col_n, lex_len, prev_col_n, total_char;
+
+    TOKEN curr_token;
 
     std::string::iterator line_ptr;
     std::string *input_line;

@@ -15,6 +15,7 @@
 #define _LILUA_SCANNER_H
 
 #include <fstream>                // Used for file input
+#include <string>
 #include "lilua_symbol.h"         // Symbol definitions
 
 #define LEXEME_BUFFER_SIZE  100   // The length of current_lexeme string
@@ -100,19 +101,25 @@ namespace lilua_interpreter_project {
     // TOKEN getCol()
     // Returns the current columb in the input file.
     // =========================================================================
-    size_t getCol() {return distance(input_line->begin(),line_ptr);}
+    size_t getColNumber() {return distance(input_line->begin(),line_ptr);}
 
     // =========================================================================
     // TOKEN getLine()
     // Returns the current line of the input file.
     // =========================================================================
-    size_t getLine() {return line_n;}
+    size_t getLineNumber() {return line_n;}
 
     // =========================================================================
-    // TOKEN getLine()
-    // Returns the current line of the input file.
+    // bool eof()
+    // Returns true if the input file stream reached the end of the file.
     // =========================================================================
     bool eof() {return eof_flag;}
+
+    // =========================================================================
+    // void close()
+    // Manually closes the input file stream.
+    // =========================================================================
+    void close() {sourceFile->close();}
 
   private:
     // =========================================================================

@@ -8,11 +8,11 @@
 // Description:
 // This file is the implementation of the scanner class.
 // =============================================================================
-#include <iostream>
-#include <cassert>
-#include <string.h>
+#include <iostream>           // Console output
+#include <cassert>            // Assert statements
+#include <string.h>           // String class
 #include "Scanner.h"
-#include "lilua_symbol.h"
+#include "lilua_symbol.h"     // LiLua symbol definitions
 
 namespace lilua_interpreter_project {
 
@@ -40,10 +40,9 @@ namespace lilua_interpreter_project {
     fnf_flag = false;
 
     // Checks to see if the input file is valid
-    if (sourceFile->fail()) {
+    if (!sourceFile->good()) {
       fnf_flag = true;
       std::cout << "Failed to open file..." << '\n';
-      sourceFile->clear();
     } else {
       line_n = 0;
       col_n = 0;
@@ -69,7 +68,7 @@ namespace lilua_interpreter_project {
     // non-whitespace character.
     skipWhitespace();
 
-    if (eof()) return (TOKEN) {EOF_TOKEN, '\0'};
+    if (eof()) return (TOKEN) {EOF_TOKEN, '\0', 1};
 
     do {
       c = getChar();
@@ -78,11 +77,17 @@ namespace lilua_interpreter_project {
       if (std::isalpha(c)) {
         if (current_token == ID) {
           current_token = UKNOWN_KEYWORD;
-        } else if (current_token != UKNOWN_KEYWORD) {
+        } else if (current_token == UNKNOWN_TOKEN) {
           current_token = ID;
+        } else if (current_token != UKNOWN_KEYWORD) {
+          return (TOKEN) {ERR_TOKEN, '\0', 1};
         }
       } else if (std::isdigit(c)) {
-        current_token = LITERAL_INTEGER;
+        if (current_token == UNKNOWN_TOKEN) {
+          current_token = LITERAL_INTEGER;
+        } else if (current_token != LITERAL_INTEGER) {
+          return (TOKEN) {ERR_TOKEN, '\0', 1};
+        }
       } else if (c == '=') {
         if (current_token == UNKNOWN_TOKEN) {
           current_token = ASSIGNMENT_OPERATOR;

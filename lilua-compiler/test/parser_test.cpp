@@ -30,7 +30,7 @@ int bytes_to_int(unsigned char b1, unsigned char b2, unsigned char b3, unsigned 
 }
 
 bool parserTest(const char* sourceFile, const char* outputFile, const INSTRUCTION ans[], size_t n) {
-  std::cout << "Parser Test for " << sourceFile << '\n';
+  std::cout << "\nParser Test for " << sourceFile << '\n';
 
   // Run parser for specific file
   Parser testParser(sourceFile, outputFile);
@@ -99,12 +99,12 @@ bool parserTest(const char* sourceFile, const char* outputFile, const INSTRUCTIO
     return false;
   }
 
-  std::cout << "TEST WAS SUCCESSFUL!!!" << "\n\n";
+  std::cout << "TEST WAS SUCCESSFUL!!!" << "\n";
 
   resultFile.close();
 
-  //if (remove(outputFile) != 0) perror( "Error deleting file" );
-  //else puts( "File successfully deleted" );
+  if (remove(outputFile) != 0) perror( "Error deleting file\n" );
+  else std::cout << "File successfully deleted" << "\n\n";
 
   return true;
 }

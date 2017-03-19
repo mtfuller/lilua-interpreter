@@ -37,6 +37,7 @@ test: $(TEST_BUILD_DIR) $(TEST_BUILD_RES_FILES) $(TEST_EXES)
 	@echo "===================================================================="
 	@echo "                          START TEST"
 	@echo "===================================================================="
+	@$(TEST_BUILD_DIR)/scanner_test.exe
 	@$(TEST_BUILD_DIR)/parser_test.exe
 
 $(SOURCE_BUILD_DIR): $(BUILD_DIR)

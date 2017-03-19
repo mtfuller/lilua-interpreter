@@ -59,24 +59,12 @@ namespace lilua_interpreter_project {
 
       // Run parse program
       if (parse_prgm()) {
-        std::cout << "SUCCESS!!! File Pos: " << file_pos << '\n';
+        std::cout << "SUCCESS!!!" << '\n';
         outputFile = new std::ofstream(outputPath->c_str(), std::ios::binary);
         size_t size = data->size();
         size_t index = 0;
         char memdata[size];
-        for (std::vector<BYTE>::iterator it = data->begin(); it != data->end(); ++it) {
-          std::cout << "INSTR: " << (int) *it << ':';
-          ++it;
-          std::cout << (int) *it << ':';
-          ++it;
-          std::cout << (int) *it << ':';
-          ++it;
-          std::cout << (int) *it << ':';
-          ++it;
-          std::cout << (int) *it << ':';
-          ++it;
-          std::cout << (int) *it << '\n';
-        }
+        std::cout << "FILE SIZE:" << size << " Bytes\n";
         for (std::vector<BYTE>::iterator it = data->begin(); it != data->end(); ++it)
             memdata[index++] = (char) *it;
         outputFile->write(memdata,size);
@@ -98,8 +86,6 @@ namespace lilua_interpreter_project {
   }
 
   bool Parser::parse_prgm() {
-    std::cout << "Let\'s Begin!" << '\n';
-
     if (!assertToken(FUNCTION_KEYWORD, this)) return false;
     if (!assertToken(ID, this)) return false;
     if (!assertToken(LEFT_PAREN_TOKEN, this)) return false;
@@ -110,7 +96,6 @@ namespace lilua_interpreter_project {
     if (!assertToken(END_KEYWORD, this)) return false;
 
     addInstruction(HALT_OP, NONE_TYPE, 0);
-    std::cout << "LINE "  << file_pos << ": " << "HALT" << '\n';
     file_pos++;
 
     return true;
@@ -166,7 +151,6 @@ namespace lilua_interpreter_project {
     if (!assertToken(THEN_KEYWORD, this)) return false;
 
     int if_cond = file_pos;
-    std::cout << "POS: " << if_cond << '\n';
     addInstruction(GOFALSE_OP, LITERAL_INTEGER, 0);
     file_pos++;
 
@@ -202,34 +186,33 @@ namespace lilua_interpreter_project {
 
     if (!assertToken(DO_KEYWORD, this)) return false;
 
-    int cond = file_pos;
-    std::cout << "LINE "  << file_pos << ": " << "GOFALSE " << "LATER" << '\n';
+    int gofalse = file_pos;
+    addInstruction(GOFALSE_OP, LITERAL_INTEGER, 0);
     file_pos++;
 
     if (!parse_block()) return false;
 
     if (!assertToken(END_KEYWORD, this)) return false;
 
-    std::cout << "LINE "  << file_pos << ": " << "GOTO " << file_pos-begin << '\n';
+    addInstruction(GOTO_OP, LITERAL_INTEGER, begin-file_pos-1);
     file_pos++;
 
-
-    std::cout << "\tLINE " << file_pos << ": On line " << cond << " GOFALSE " << file_pos-begin << '\n';
+    setInstruction(GOFALSE_OP, LITERAL_INTEGER, file_pos-gofalse-1, gofalse);
 
     return true;
   }
 
   bool Parser::parse_repeat_stmt() {
     if (!assertToken(REPEAT_KEYWORD, this)) return false;
-    int begin = file_pos;
 
+    int begin = file_pos;
     if (!parse_block()) return false;
 
     if (!assertToken(UNTIL_KEYWORD, this)) return false;
 
     if (!boolean_expression()) return false;
 
-    std::cout << "LINE "  << file_pos << ": " << "GOFALSE -" << file_pos-begin+1 << '\n';
+    addInstruction(GOFALSE_OP, LITERAL_INTEGER, begin-file_pos-1);
     file_pos++;
 
     return true;
@@ -356,7 +339,6 @@ namespace lilua_interpreter_project {
 
   void Parser::addInstruction(token_type instr=0, token_type val_t=0,
     unsigned int val=0) {
-      std::cout << "File POS: " << file_pos << "- ADD INSTR: " << instr << ":" << val_t << ":" << val << '\n';
       instr -= PUSH_OP;
 
       data->push_back((BYTE) instr);
@@ -389,17 +371,17 @@ namespace lilua_interpreter_project {
   void Parser::setInstruction(token_type instr, token_type val_t, unsigned int val, size_t pos) {
     //std::cout << "SET INSTR: " << instr << ":" << val_t << ":" << val << '\n';
 
-    std::cout << "SIZE: " << data->size() << '\n';
+    //std::cout << "SIZE: " << data->size() << '\n';
 
     size_t byte_i = pos * 6;
 
-    std::cout << "INSTRUCTIONS:";
+    /*std::cout << "INSTRUCTIONS:";
     std::cout << (int) (*data)[byte_i] << ':';
     std::cout << (int) (*data)[byte_i+1] << ':';
     std::cout << (int) (*data)[byte_i+2] << ':';
     std::cout << (int) (*data)[byte_i+3] << ':';
     std::cout << (int) (*data)[byte_i+4] << ':';
-    std::cout << (int) (*data)[byte_i+5] << '\n';
+    std::cout << (int) (*data)[byte_i+5] << '\n';*/
 
     instr -= PUSH_OP;
     (*data)[byte_i] = (BYTE) instr;

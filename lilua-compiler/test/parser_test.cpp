@@ -99,7 +99,7 @@ bool parserTest(const char* sourceFile, const char* outputFile, const INSTRUCTIO
     return false;
   }
 
-  std::cout << "TEST WAS SUCCESSFUL!!!" << '\n';
+  std::cout << "TEST WAS SUCCESSFUL!!!" << "\n\n";
 
   resultFile.close();
 
@@ -202,10 +202,137 @@ bool test2() {
   return parserTest("build/test/res/comparison.lua","build/test/comparison.lil",ans,63);
 }
 
+bool test3() {
+  INSTRUCTION ans[] = {
+    {PUSH_OP, ID_TYPE, 13},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 100},
+    {ASSIGN_OP, NONE_TYPE, 0},
+    {PUSH_OP, ID_TYPE, 2},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 1},
+    {ASSIGN_OP, NONE_TYPE, 0},
+    {PUSH_OP, ID_TYPE, 17},
+    {PUSH_OP, ID_TYPE, 2},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 2},
+    {PUSH_OP, ID_TYPE, 2},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 2},
+    {DIV_OP, NONE_TYPE, 0},
+    {MULT_OP, NONE_TYPE, 0},
+    {SUB_OP, NONE_TYPE, 0},
+    {ASSIGN_OP, NONE_TYPE, 0},
+    {PUSH_OP, ID_TYPE, 17},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 0},
+    {EQ_OP, NONE_TYPE, 0},
+    {GOFALSE_OP, LITERAL_INTEGER_TYPE, 8},
+    {PUSH_OP, ID_TYPE, 2},
+    {PRINT_OP, NONE_TYPE, 0},
+    {PUSH_OP, ID_TYPE, 2},
+    {PUSH_OP, ID_TYPE, 2},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 1},
+    {ADD_OP, NONE_TYPE, 0},
+    {ASSIGN_OP, NONE_TYPE, 0},
+    {GOTO_OP, LITERAL_INTEGER_TYPE, 6},
+    {PUSH_OP, ID_TYPE, 2},
+    {PUSH_OP, ID_TYPE, 2},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 1},
+    {ADD_OP, NONE_TYPE, 0},
+    {ASSIGN_OP, NONE_TYPE, 0},
+    {GOTO_OP, LITERAL_INTEGER_TYPE, 0},
+    {PUSH_OP, ID_TYPE, 2},
+    {PUSH_OP, ID_TYPE, 13},
+    {GT_OP, NONE_TYPE, 0},
+    {GOFALSE_OP, LITERAL_INTEGER_TYPE, -31},
+    {HALT_OP, NONE_TYPE, 0}
+  };
+  return parserTest("build/test/res/even-nums.lua","build/test/even-nums.lil",ans,38);
+}
+
+bool test4() {
+  INSTRUCTION ans[] = {
+    {PUSH_OP, ID_TYPE, 13},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 8},
+    {ASSIGN_OP, NONE_TYPE, 0},
+    {PUSH_OP, ID_TYPE, 13},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 0},
+    {GT_OP, NONE_TYPE, 0},
+    {GOFALSE_OP, LITERAL_INTEGER_TYPE, 64},
+    {PUSH_OP, ID_TYPE, 0},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 0},
+    {ASSIGN_OP, NONE_TYPE, 0},
+    {PUSH_OP, ID_TYPE, 1},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 1},
+    {ASSIGN_OP, NONE_TYPE, 0},
+    {PUSH_OP, ID_TYPE, 0},
+    {PRINT_OP, NONE_TYPE, 0},
+    {PUSH_OP, ID_TYPE, 13},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 1},
+    {EQ_OP, NONE_TYPE, 0},
+    {GOFALSE_OP, LITERAL_INTEGER_TYPE, 6},
+    {PUSH_OP, ID_TYPE, 13},
+    {PUSH_OP, ID_TYPE, 13},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 1},
+    {SUB_OP, NONE_TYPE, 0},
+    {ASSIGN_OP, NONE_TYPE, 0},
+    {GOTO_OP, LITERAL_INTEGER_TYPE, 45},
+    {PUSH_OP, ID_TYPE, 1},
+    {PRINT_OP, NONE_TYPE, 0},
+    {PUSH_OP, ID_TYPE, 13},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 2},
+    {EQ_OP, NONE_TYPE, 0},
+    {GOFALSE_OP, LITERAL_INTEGER_TYPE, 6},
+    {PUSH_OP, ID_TYPE, 13},
+    {PUSH_OP, ID_TYPE, 13},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 1},
+    {SUB_OP, NONE_TYPE, 0},
+    {ASSIGN_OP, NONE_TYPE, 0},
+    {GOTO_OP, LITERAL_INTEGER_TYPE, 32},
+    {PUSH_OP, ID_TYPE, 2},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 0},
+    {ASSIGN_OP, NONE_TYPE, 0},
+    {PUSH_OP, ID_TYPE, 13},
+    {PUSH_OP, ID_TYPE, 13},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 2},
+    {SUB_OP, NONE_TYPE, 0},
+    {ASSIGN_OP, NONE_TYPE, 0},
+    {PUSH_OP, ID_TYPE, 13},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 0},
+    {GT_OP, NONE_TYPE, 0},
+    {GOFALSE_OP, LITERAL_INTEGER_TYPE, 19},
+    {PUSH_OP, ID_TYPE, 2},
+    {PUSH_OP, ID_TYPE, 0},
+    {PUSH_OP, ID_TYPE, 1},
+    {ADD_OP, NONE_TYPE, 0},
+    {ASSIGN_OP, NONE_TYPE, 0},
+    {PUSH_OP, ID_TYPE, 0},
+    {PUSH_OP, ID_TYPE, 1},
+    {ASSIGN_OP, NONE_TYPE, 0},
+    {PUSH_OP, ID_TYPE, 1},
+    {PUSH_OP, ID_TYPE, 2},
+    {ASSIGN_OP, NONE_TYPE, 0},
+  	{PUSH_OP, ID_TYPE, 2},
+  	{PRINT_OP, NONE_TYPE, 0},
+    {PUSH_OP, ID_TYPE, 13},
+    {PUSH_OP, ID_TYPE, 13},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 1},
+    {SUB_OP, NONE_TYPE, 0},
+    {ASSIGN_OP, NONE_TYPE, 0},
+    {GOTO_OP, LITERAL_INTEGER_TYPE, -23},
+    {GOTO_OP, LITERAL_INTEGER_TYPE, 0},
+    {GOTO_OP, LITERAL_INTEGER_TYPE, 0},
+    {GOTO_OP, LITERAL_INTEGER_TYPE, 3},
+    {PUSH_OP, LITERAL_INTEGER_TYPE, 0},
+    {PRINT_OP, NONE_TYPE, 0},
+    {GOTO_OP, LITERAL_INTEGER_TYPE, 0},
+    {HALT_OP, NONE_TYPE, 0}
+  };
+  return parserTest("build/test/res/fibonacci.lua","build/test/fibonacci.lil",ans,75);
+}
+
 int main() {
 
   if (!test1()) return -1;
   if (!test2()) return -1;
+  if (!test3()) return -1;
+  if (!test4()) return -1;
 
   return 0;
 }

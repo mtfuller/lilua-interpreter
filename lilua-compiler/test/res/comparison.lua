@@ -11,7 +11,7 @@ function f()
   if d > 1 then
     print(d)
   else
-    print(2)
+    print(0)
   end
   if f < 0 then
     print (f)

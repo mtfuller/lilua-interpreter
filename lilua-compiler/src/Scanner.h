@@ -30,6 +30,7 @@ namespace lilua_interpreter_project {
   struct TOKEN {
     token_type token;
     char lex[15];
+    size_t size;
   };
 
   // ===========================================================================

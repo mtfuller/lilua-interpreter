@@ -29,7 +29,7 @@ int get_token_index(token_type token_code) {
   return token_code + 1;
 }
 
-bool lexeme_comp(LEXEME actual, LEXEME expected) {
+bool lexeme_comp(TOKEN actual, TOKEN expected) {
     if (actual.token == expected.token) {
         char substring[11];
         memcpy(substring, actual.lex, 10);
@@ -58,13 +58,13 @@ bool keyword_test(const char* key, int expected) {
     }
 }
 
-bool scanner_test(const char* file, const LEXEME* ans) {
+bool scanner_test(const char* file, const TOKEN* ans) {
     size_t index = 0;
     std::cout << "Testing scanner with the file: \"" << file << "\"...\n";
     Scanner myScanner(file);
-    LEXEME test;
+    TOKEN test;
     for (int i = 0; i < TABLE_WIDTH; i++) printf("=");
-    printf("\n| %-20s | %-15s |\n", "TOKEN CODE", "LEXEME");
+    printf("\n| %-20s | %-15s |\n", "TOKEN CODE", "TOKEN");
     for (int i = 0; i < TABLE_WIDTH; i++) printf("=");
     printf("\n");
     do {
@@ -86,7 +86,7 @@ bool scanner_test(const char* file, const LEXEME* ans) {
 // =============================================================================
 bool test1() {
     const char simple[] = "build/test/res/simple.lua";
-    const LEXEME ans1[] = {
+    const TOKEN ans1[] = {
         {FUNCTION_KEYWORD,"function"},
         {ID,"f"},
         {LEFT_PAREN_TOKEN,"("},
@@ -126,7 +126,7 @@ bool test1() {
 // =============================================================================
 bool test2() {
     char fibonacci[] = "build/test/res/fibonacci.lua";
-    const LEXEME ans2[] = {
+    const TOKEN ans2[] = {
         {FUNCTION_KEYWORD,"function"},
         {ID,"f"},
         {LEFT_PAREN_TOKEN,"("},
@@ -230,7 +230,7 @@ bool test2() {
 // =============================================================================
 bool test3() {
     char comparison[] = "build/test/res/comparison.lua";
-    const LEXEME ans3[] = {
+    const TOKEN ans3[] = {
         {FUNCTION_KEYWORD,"function"},
         {ID,"f"},
         {LEFT_PAREN_TOKEN,"("},
@@ -332,10 +332,11 @@ int main() {
     if (!keyword_test("do", DO_KEYWORD)) return -1;
     if (!keyword_test("while", WHILE_KEYWORD)) return -1;
     if (!keyword_test("notinthetable", -1)) return -1;
+    if (!keyword_test("aaaaa", -1)) return -1;
+    if (!keyword_test("zzzzz", -1)) return -1;
 
     if (!test1()) return -1;
     if (!test2()) return -1;
     if (!test3()) return -1;
-
     return 0;
 }

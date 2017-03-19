@@ -63,7 +63,7 @@ namespace lilua_interpreter_project {
     int index = 0;
     current_token = UNKNOWN_TOKEN;
 
-    memset (current_lexeme,' ',10);
+    memset (current_lexeme,' ',15);
 
     // Keep getting new characters from the file until getChar() will return a
     // non-whitespace character.
@@ -142,6 +142,7 @@ namespace lilua_interpreter_project {
     TOKEN nextToken;
     nextToken.token = current_token;
     strcpy(nextToken.lex, current_lexeme);
+    nextToken.size = index;
 
     return nextToken;
   }

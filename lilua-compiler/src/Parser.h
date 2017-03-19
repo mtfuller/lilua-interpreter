@@ -13,10 +13,13 @@
 #ifndef _LILUA_PARSER_H
 #define _LILUA_PARSER_H
 
+#include <vector>
 #include "Scanner.h"
 #include "lilua_symbol.h"         // Symbol definitions
 
 namespace lilua_interpreter_project {
+
+  typedef char BYTE;
 
   bool isStatement(const TOKEN lex);
 
@@ -44,17 +47,23 @@ namespace lilua_interpreter_project {
     bool arithmetic_op(const TOKEN op);
 
     void print_err_pos() const;
-    void addInstruction(token_type instr, token_type val_t, int val);
+    void addInstruction(token_type instr, token_type val_t, unsigned int val);
+    void setInstruction(token_type instr, token_type val_t, unsigned int val, size_t pos);
 
     friend bool assertToken(const token_type expectedCode, Parser* parser);
 
     TOKEN current;
-    Scanner* lexicalAnalyzer;
-    std::ofstream* outputFile;
+    Scanner *lexicalAnalyzer;
+    std::string *outputPath;
+    std::ofstream *outputFile;
+
+    std::vector<BYTE>* data;
+
     size_t size_of_block;
     size_t file_pos;
-    size_t source_line_n;
-    size_t source_col_n;
+    size_t source_line_n, source_col_n;
+
+
   };
 
 };

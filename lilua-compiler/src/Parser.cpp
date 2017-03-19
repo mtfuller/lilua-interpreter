@@ -2,16 +2,20 @@
 // Author(s): Thomas Fuller
 // Course:    CS 4308 (01)
 // Instr:     Dr. Garrido
-// Project:   Module 3 - 1st Deliverable
-// File:      Scanner.cpp
+// Project:   Module 5 - 2nd Deliverable
+// File:      Parser.cpp
 // =============================================================================
 // Description:
 // This file is the implementation of the scanner class.
 // =============================================================================
 
 #include <iostream>
+#include <fstream>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <cctype>
 #include "Parser.h"
-
 
 namespace lilua_interpreter_project {
   bool isStatement(const TOKEN lex) {
@@ -32,7 +36,8 @@ namespace lilua_interpreter_project {
 
   Parser::Parser(const char *source_file, const char *output_file) {
     lexicalAnalyzer = new Scanner(source_file);
-    outputFile = new std::ofstream(output_file);
+    outputPath = new std::string(output_file);
+    data = new std::vector<BYTE>;
     size_of_block = 0;
     file_pos = 0;
   }
@@ -40,6 +45,8 @@ namespace lilua_interpreter_project {
   Parser::~Parser() {
     delete lexicalAnalyzer;
     delete outputFile;
+    delete outputPath;
+    delete data;
   }
 
   bool Parser::parse() {
@@ -53,7 +60,28 @@ namespace lilua_interpreter_project {
       // Run parse program
       if (parse_prgm()) {
         std::cout << "SUCCESS!!! File Pos: " << file_pos << '\n';
+        outputFile = new std::ofstream(outputPath->c_str(), std::ios::binary);
+        size_t size = data->size();
+        size_t index = 0;
+        char memdata[size];
+        for (std::vector<BYTE>::iterator it = data->begin(); it != data->end(); ++it) {
+          std::cout << "INSTR: " << (int) *it << ':';
+          ++it;
+          std::cout << (int) *it << ':';
+          ++it;
+          std::cout << (int) *it << ':';
+          ++it;
+          std::cout << (int) *it << ':';
+          ++it;
+          std::cout << (int) *it << ':';
+          ++it;
+          std::cout << (int) *it << '\n';
+        }
+        for (std::vector<BYTE>::iterator it = data->begin(); it != data->end(); ++it)
+            memdata[index++] = (char) *it;
+        outputFile->write(memdata,size);
         outputFile->close();
+
         return true;
       } else {
         print_err_pos();
@@ -81,6 +109,7 @@ namespace lilua_interpreter_project {
 
     if (!assertToken(END_KEYWORD, this)) return false;
 
+    addInstruction(HALT_OP, NONE_TYPE, 0);
     std::cout << "LINE "  << file_pos << ": " << "HALT" << '\n';
     file_pos++;
 
@@ -115,14 +144,16 @@ namespace lilua_interpreter_project {
       std::cout << "Unexpected token. Expected an ID, but received a\"" << id.token << "\"." << '\n';
       return false;
     }
-    std::cout << "LINE "  << file_pos << ": " << "PUSH " << id.lex << '\n';
+
+    int id_code = toupper(id.lex[0]) - 'A';
+    addInstruction(PUSH_OP, id.token, id_code);
     file_pos++;
 
     if (!assertToken(ASSIGNMENT_OPERATOR, this)) return false;
 
     if (!arithmetic_expression()) return false;
 
-    std::cout << "LINE "  << file_pos << ": " << "ASSIGN OP" << '\n';
+    addInstruction(ASSIGN_OP, NONE_TYPE, 0);
     file_pos++;
     return true;
   }
@@ -134,28 +165,31 @@ namespace lilua_interpreter_project {
 
     if (!assertToken(THEN_KEYWORD, this)) return false;
 
-    int cond = file_pos;
-    std::cout << "LINE "  << file_pos << ": " << "GOFALSE " << "LATER" << '\n';
+    int if_cond = file_pos;
+    std::cout << "POS: " << if_cond << '\n';
+    addInstruction(GOFALSE_OP, LITERAL_INTEGER, 0);
     file_pos++;
 
+    int blk1 = file_pos;
     if (!parse_block()) return false;
 
-    //int jmp1 = file_pos;
-    std::cout << "LINE "  << file_pos << ": " << "GOTO " << "END" << '\n';
+    setInstruction(GOFALSE_OP, LITERAL_INTEGER, file_pos-blk1+1, if_cond);
+
+    int else_cond = file_pos;
+    addInstruction(GOTO_OP, NONE_TYPE, 0);
     file_pos++;
 
     if (!assertToken(ELSE_KEYWORD, this)) return false;
 
+    int blk2 = file_pos;
     if (!parse_block()) return false;
 
     int jmp2 = file_pos;
-    std::cout << "LINE "  << file_pos << ": " << "GOTO " << 0 << '\n';
+    addInstruction(GOTO_OP, LITERAL_INTEGER, 0);
     file_pos++;
+    setInstruction(GOTO_OP, LITERAL_INTEGER, file_pos-blk2, else_cond);
 
     if (!assertToken(END_KEYWORD, this)) return false;
-
-    std::cout << "<<< On line " << cond << " GOFALSE "
-      << jmp2-cond << " >>>\n";
 
     return true;
   }
@@ -178,6 +212,7 @@ namespace lilua_interpreter_project {
 
     std::cout << "LINE "  << file_pos << ": " << "GOTO " << file_pos-begin << '\n';
     file_pos++;
+
 
     std::cout << "\tLINE " << file_pos << ": On line " << cond << " GOFALSE " << file_pos-begin << '\n';
 
@@ -208,7 +243,7 @@ namespace lilua_interpreter_project {
 
     if (!assertToken(RIGHT_PAREN_TOKEN, this)) return false;
 
-    std::cout << "LINE "  << file_pos << ": " << "PRINT" << '\n';
+    addInstruction(PRINT_OP, NONE_TYPE, 0);
     file_pos++;
 
     return true;
@@ -227,22 +262,22 @@ namespace lilua_interpreter_project {
 
   bool Parser::relative_op(const TOKEN op) {
     if (op.token == LE_OPERATOR) {
-      std::cout << "LINE " << file_pos << ": " << "<= OP" << '\n';
+      addInstruction(LE_OP, NONE_TYPE, 0);
       file_pos++;
     } else if (op.token == LT_OPERATOR) {
-      std::cout << "LINE " << file_pos << ": " << "< OP" << '\n';
+      addInstruction(LT_OP, NONE_TYPE, 0);
       file_pos++;
     } else if (op.token == GE_OPERATOR) {
-      std::cout << "LINE " << file_pos << ": " << ">= OP" << '\n';
+      addInstruction(GE_OP, NONE_TYPE, 0);
       file_pos++;
     } else if (op.token == GT_OPERATOR) {
-      std::cout << "LINE " << file_pos << ": " << "> OP" << '\n';
+      addInstruction(GT_OP, NONE_TYPE, 0);
       file_pos++;
     } else if (op.token == EQ_OPERATOR) {
-      std::cout << "LINE " << file_pos << ": " << "== OPP" << '\n';
+      addInstruction(EQ_OP, NONE_TYPE, 0);
       file_pos++;
     } else if (op.token == NE_OPERATOR) {
-      std::cout << "LINE " << file_pos << ": " << "!= OPP" << '\n';
+      addInstruction(NOT_EQ_OP, NONE_TYPE, 0);
       file_pos++;
     } else {
       print_err_pos();
@@ -254,15 +289,22 @@ namespace lilua_interpreter_project {
 
   bool Parser::arithmetic_expression() {
     TOKEN first_expr = getToken();
-    std::cout << "TOKEN: " << first_expr.token << '\n';
-    std::cout << "LEX: " << first_expr.lex << '\n';
-    if (first_expr.token != ID && first_expr.token != LITERAL_INTEGER) {
+    if (first_expr.token == ID) {
+      int id_code = toupper(first_expr.lex[0]) - 'A';
+      addInstruction(PUSH_OP, first_expr.token, id_code);
+    } else if (first_expr.token == LITERAL_INTEGER) {
+      char temp[first_expr.size];
+      strncpy(temp, first_expr.lex, first_expr.size);
+      temp[first_expr.size] = '\0';
+      int val = atoi(temp);
+      addInstruction(PUSH_OP, first_expr.token, val);
+    } else {
       print_err_pos();
       std::cout << "Unexpected token. Expected an ID or Integer." << '\n';
       return false;
     }
-    std::cout << "LINE " << file_pos << ": " << "PUSH " << first_expr.lex << '\n';
     file_pos++;
+
     // peek token
     TOKEN next = nextToken();
     if (next.token == ADD_OPERATOR || next.token == SUB_OPERATOR ||
@@ -276,16 +318,16 @@ namespace lilua_interpreter_project {
 
   bool Parser::arithmetic_op(const TOKEN op) {
     if (op.token == ADD_OPERATOR) {
-      std::cout << "LINE "  << file_pos << ": " << "ADD OP" << '\n';
+      addInstruction(ADD_OP,NONE_TYPE,0);
       file_pos++;
     } else if(op.token == SUB_OPERATOR) {
-      std::cout << "LINE "  << file_pos << ": " << "SUB OP" << '\n';
+      addInstruction(SUB_OP,NONE_TYPE,0);
       file_pos++;
     } else if(op.token == MULT_OPERATOR) {
-      std::cout << "LINE "  << file_pos << ": " << "MULT OP" << '\n';
+      addInstruction(MULT_OP,NONE_TYPE,0);
       file_pos++;
     } else if(op.token == DIV_OPERATOR) {
-      std::cout << "LINE "  << file_pos << ": " << "DIV OP" << '\n';
+      addInstruction(DIV_OP,NONE_TYPE,0);
       file_pos++;
     } else {
       print_err_pos();
@@ -313,29 +355,78 @@ namespace lilua_interpreter_project {
   }
 
   void Parser::addInstruction(token_type instr=0, token_type val_t=0,
-    int val=0) {
+    unsigned int val=0) {
+      std::cout << "File POS: " << file_pos << "- ADD INSTR: " << instr << ":" << val_t << ":" << val << '\n';
+      instr -= PUSH_OP;
 
-      instr -= PUSH_OPP;
-      *outputFile << instr << ' ';
+      data->push_back((BYTE) instr);
 
       switch (val_t) {
         case 0:
-          *outputFile << 0 << ' ';;
+          data->push_back((BYTE) 0);
           break;
         case ID:
-          *outputFile << 3 << ' ';;
+          data->push_back((BYTE) 3);
           break;
         case LITERAL_INTEGER:
-          *outputFile << 2 << ' ';;
+          data->push_back((BYTE) 2);
           break;
         default:
           print_err_pos();
           std::cout << "Incorrect type code" << '\n';
       }
 
-      *outputFile << val;
+      char c[4];
 
-      *outputFile << '\n';
+      c[0] = val & 0xFF;
+      c[1] = (val>>8) & 0xFF;
+      c[2] = (val>>16) & 0xFF;
+      c[3] = (val>>24) & 0xFF;
+
+      for (int i = 0; i < 4; i++) data->push_back((BYTE) c[i]);
   }
+
+  void Parser::setInstruction(token_type instr, token_type val_t, unsigned int val, size_t pos) {
+    //std::cout << "SET INSTR: " << instr << ":" << val_t << ":" << val << '\n';
+
+    std::cout << "SIZE: " << data->size() << '\n';
+
+    size_t byte_i = pos * 6;
+
+    std::cout << "INSTRUCTIONS:";
+    std::cout << (int) (*data)[byte_i] << ':';
+    std::cout << (int) (*data)[byte_i+1] << ':';
+    std::cout << (int) (*data)[byte_i+2] << ':';
+    std::cout << (int) (*data)[byte_i+3] << ':';
+    std::cout << (int) (*data)[byte_i+4] << ':';
+    std::cout << (int) (*data)[byte_i+5] << '\n';
+
+    instr -= PUSH_OP;
+    (*data)[byte_i] = (BYTE) instr;
+
+    switch (val_t) {
+      case 0:
+        (*data)[byte_i+1] = (BYTE) 0;
+        break;
+      case ID:
+        (*data)[byte_i+1] = (BYTE) 3;
+        break;
+      case LITERAL_INTEGER:
+        (*data)[byte_i+1] = (BYTE) 2;
+        break;
+      default:
+        print_err_pos();
+        std::cout << "Incorrect type code" << '\n';
+    }
+
+    char c[4];
+
+    c[0] = val & 0xFF;
+    c[1] = (val>>8) & 0xFF;
+    c[2] = (val>>16) & 0xFF;
+    c[3] = (val>>24) & 0xFF;
+
+    for (int i = 0; i < 4; i++) (*data)[byte_i+2+i] = (BYTE) c[i];
+  };
 
 };

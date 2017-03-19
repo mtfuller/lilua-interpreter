@@ -1,109 +1,17 @@
-<keyword>         function
-<id>              f
-<Unknown>         (
-<Unknown>         )
-<id>              a
-<assignment_op>   =
-<integer_literal> 7
-<keyword>         print
-<Unknown>         (
-<id>              a
-<Unknown>         )
-<id>              b
-<assignment_op>   =
-<digit_literal>   8
-<keyword>         print
-<Unknown>         (
-<id>              b
-<Unknown>         )
-<id>              c
-<assignment_op>   =
-<mul_operator>    *
-<id>              a
-<id>              b
-<keyword>         print
-<Unknown>         (
-<id>              c
-<Unknown>         )
-<keyword>         end
-
-=================================
-RESULTS:
-=================================
-
-<function_keyword> <id: f> <Unknown: (> <Unknown: )>
-  <id: a> <assignment_op> <integer_literal: 7>
-  <print_keyword> <Unknown: (> <id: a> <Unknown: )>
-  <id: b> <assignment_op> <digit_literal>
-  <print_keyword> <Unknown: (> <id: b> <Unknown: )>
-  <id: c> <assignment_op> <id: a> <mul_operator> <id: b>
-  <print_keyword> <Unknown: (> <id: c> <Unknown: )>
-<end_keyword>
-
-<program> =>  <function_keyword> <id> <left_paren> <right_paren> <block> <end_keyword>
-          =>  <function_keyword> <id> <left_paren> <right_paren> <statement> <block> <end_keyword>
-          =>  <function_keyword> <id> <left_paren> <right_paren> <assignment_statement> <block> <end_keyword>
-
-a
-7
-=
-a
-print
-b
-8
-=
-b
-print
-c
-a
-b
-*
-=
-c
-print
-
-00 - ID
-01 - LIT
-10 - OP
-11 - BR
-
-ID:
-00000
-...
-11001
-
-LIT:
-00000000 00000000 00000000 00000000 (DEC 0)
-...
-11111111 11111111 11111111 11111111 (DEC 4,294,967,295)
-
-OP:
-+
--
-*
-/
-print
-<
-<=
-=
-==
->
->=
-label
-goto
-
-
-i = 0
-while i < 100
-  i++
-
-push i
-push 0
-= OP
-LABEL loop
-push i
-++ OP
-goto loop
-push i
-push 100
-< OP
+PUSH A
+PUSH 7
+ASSIGN OP
+PUSH A
+PRINT
+PUSH B
+PUSH 8
+ASSIGN OP
+PUSH B
+PRINT
+PUSH C
+PUSH A
+PUSH B
+MULT OP
+ASSIGN OP
+PUSH C
+PRINT

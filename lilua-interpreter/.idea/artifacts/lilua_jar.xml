@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="lilua:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/lilua_jar</output-path>
+    <root id="archive" name="lilua.jar">
+      <element id="module-output" name="lilua-interpreter" />
+    </root>
+  </artifact>
+</component>

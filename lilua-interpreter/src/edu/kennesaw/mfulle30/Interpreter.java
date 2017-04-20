@@ -1,4 +1,29 @@
-package edu.kennesaw.ccse.mfulle30;
+// =============================================================================
+// Author(s): Thomas Fuller
+// Course:    CS 4308 (01)
+// Instr:     Dr. Garrido
+// Project:   Module 7 - 3rd Deliverable
+// File:      Interpreter.java
+// Date:      04/20/17
+// =============================================================================
+// Description:
+// This class defines the behavior of the interpreter or executor for
+// interpreting the input file given by the user. The Interpreter contains three
+// main pieces of data to facilitate most of the instruction execution:
+//      1.  Instruction Array - to hold all of the instructions found in the
+//          file.
+//      2.  Stack - to hold the Data Values that are pushed/popped to and from
+//          the stack in order to evaluate expressions
+//      3.  Symbol Table - to hold the numeric values of all identifiers
+//
+// To interpret a file, the run method is called and then the Instruction Array
+// is filled with all instructions from the file. The method begins to execute
+// each instruction, by calling the execute() method for each instruction in the
+// Instruction Array. The execute() method simple executes an instruction, based
+// on its defined OpCode.
+// =============================================================================
+
+package edu.kennesaw.mfulle30;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -18,6 +43,8 @@ public class Interpreter {
 
     public Interpreter(byte[] byteArray) {
         this.byteArray = byteArray;
+
+        // Initialize the symbol table
         symbolTable = new int[26];
     }
 
